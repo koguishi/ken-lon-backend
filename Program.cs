@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 var frontendUrl = builder.Configuration["FRONTEND_URL"];
+Console.WriteLine(frontendUrl);
 
 // 1. Adicionar política de CORS
 builder.Services.AddCors(options =>
