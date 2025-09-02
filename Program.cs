@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var frontendUrl = builder.Configuration["FRONTEND_URL"];
+var frontendUrl = builder.Configuration["FRONTEND_URL"] ?? string.Empty;
 
 // 1. Adicionar política de CORS
 builder.Services.AddCors(options =>
@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("https://witty-forest-0f9e3350f.1.azurestaticapps.net")
+            policy.WithOrigins(frontendUrl)
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
