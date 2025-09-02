@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins(frontendUrl)
+            policy.WithOrigins("https://witty-forest-0f9e3350f.1.azurestaticapps.net")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
