@@ -2,9 +2,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace AcademiaApi.Models;
+namespace kendo_londrina.Models;
 
-public class Aluno
+public class Aluno_OLD
 {
     // public Guid EscolaId
     // {

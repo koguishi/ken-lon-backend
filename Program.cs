@@ -1,4 +1,4 @@
-using AcademiaApi.Data;
+using kendo_londrina.Infra;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<AcademiaContext>(options =>
+builder.Services.AddDbContext<KendoLondrinaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();

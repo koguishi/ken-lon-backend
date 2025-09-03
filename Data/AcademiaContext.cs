@@ -1,12 +1,12 @@
-using AcademiaApi.Models;
+using kendo_londrina.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AcademiaApi.Data;
+namespace kendo_londrina.Data;
 
 public class AcademiaContext : DbContext
 {
     public AcademiaContext(DbContextOptions<AcademiaContext> options) : base(options) { }
 
-    public DbSet<Aluno> Alunos => Set<Aluno>();
+    public DbSet<Aluno_OLD> Alunos => Set<Aluno_OLD>();
 
 }

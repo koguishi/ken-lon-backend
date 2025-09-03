@@ -1,33 +1,7 @@
-using AcademiaApi.Data;
-using AcademiaApi.Models;
+using kendo_londrina.Domain.Entities;
+using kendo_londrina.Infra;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-// [ApiController]
-// [Route("api/[controller]")]
-// public class AlunosController : ControllerBase
-// {
-//     private readonly AcademiaContext _context;
-
-//     public AlunosController(AcademiaContext context)
-//     {
-//         _context = context;
-//     }
-
-//     [HttpGet]
-//     public async Task<IActionResult> GetAlunos()
-//     {
-//         return Ok(await _context.Alunos.ToListAsync());
-//     }
-
-//     [HttpPost]
-//     public async Task<IActionResult> CreateAluno(Aluno aluno)
-//     {
-//         _context.Alunos.Add(aluno);
-//         await _context.SaveChangesAsync();
-//         return CreatedAtAction(nameof(GetAlunos), new { id = aluno.Id }, aluno);
-//     }
-// }
 
 namespace AcademiaApi.Controllers;
 
@@ -35,9 +9,9 @@ namespace AcademiaApi.Controllers;
 [Route("api/[controller]")]
 public class AlunosController : ControllerBase
 {
-    private readonly AcademiaContext _context;
+    private readonly KendoLondrinaContext _context;
 
-    public AlunosController(AcademiaContext context)
+    public AlunosController(KendoLondrinaContext context)
     {
         _context = context;
     }
