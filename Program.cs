@@ -1,4 +1,7 @@
+using kendo_londrina.Application.Services;
+using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Infra;
+using kendo_londrina.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +25,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<KendoLondrinaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Dependency Injection
+
+builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
+builder.Services.AddScoped<AlunoService>();
+// builder.Services.AddScoped<IMensalidadeRepository, MensalidadeRepository>();
+// builder.Services.AddScoped<MensalidadeService>();
 
 var app = builder.Build();
 
