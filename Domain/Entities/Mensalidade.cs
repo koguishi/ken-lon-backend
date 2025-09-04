@@ -1,10 +1,11 @@
+using kendo_londrina.Domain.Entities.AbstractClasses;
+
 namespace kendo_londrina.Domain.Entities
 {
-    public class Mensalidade
+    public class Mensalidade : Entity
     {
-        public Guid Id { get; private set; }
         public Guid AlunoId { get; private set; }
-        public string AlunoNome { get; private set; }
+        public string? AlunoNome { get; private set; }
         public decimal Valor { get; private set; }
         public DateTime DataVencimento { get; private set; }
         public DateTime? DataPagamento { get; private set; }
@@ -13,6 +14,7 @@ namespace kendo_londrina.Domain.Entities
         public bool Excluida { get; private set; }
         public string? MotivoExclusao { get; private set; }
         public DateTime? DataExclusao { get; private set; }
+        virtual public Aluno? Aluno { get; private set; }
 
         private Mensalidade() { } // para EF Core
 

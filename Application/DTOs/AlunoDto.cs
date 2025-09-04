@@ -1,8 +1,9 @@
 namespace kendo_londrina.Application.DTOs;
 public class AlunoDto
 {
-    public string? Nome { get; set; }
-    public DateTime? DataNascimento { get; set; }
+    public Guid? Id { get; set; }
+    public required string Nome { get; set; }
+    public DateTime DataNascimento { get; set; }
     public string? Cpf { get; set; }
     public string? TelCelular { get; set; }
     public string? Email { get; set; }

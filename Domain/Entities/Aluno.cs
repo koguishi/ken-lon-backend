@@ -1,43 +1,23 @@
-using System.ComponentModel.DataAnnotations;
+using kendo_londrina.Domain.Entities.AbstractClasses;
 
 namespace kendo_londrina.Domain.Entities;
 
-public class Aluno
+public class Aluno : Entity
 {
-    public Guid EscolaId { get; set; } = Guid.Parse("b3e53df9-b128-4227-81fe-cc0b9ad9720b");
-    public Guid Id { get; set; }
-
-    [Required, MaxLength(100)]
+    public string Codigo { get; set; } = string.Empty;
     public string Nome { get; set; } = string.Empty;
-
-    [MaxLength(15)]
     public string? Cpf { get; set; }
-
-    [MaxLength(20)]
     public string? TelCelular { get; set; }
-
-    [EmailAddress, MaxLength(200)]
     public string? Email { get; set; }
-
     public DateTime DataNascimento { get; set; }
-
-    [MaxLength(100)]
     public string? Nacionalidade { get; set; }
-
-    [MaxLength(2)]
     public string? UfNascimento { get; set; }
-
-    [MaxLength(100)]
     public string? CidadeNascimento { get; set; }
-
-    [MaxLength(1)]
     public string? Sexo { get; set; }
-
-    [MaxLength(50)]
     public string? Rg { get; set; }
-
-    [MaxLength(50)]
     public string? Religiao { get; set; }
+    public Guid? EnderecoId { get; private set; }
+    virtual public IEnumerable<Mensalidade>? Mensalidades { get; private set; }    
 
     // Construtor para criar novo aluno
     public Aluno(string nome, DateTime dataNascimento,

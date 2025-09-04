@@ -14,20 +14,18 @@ namespace kendo_londrina.Application.Services
             _repo = repo;
         }
 
-        public async Task<Aluno> CriarAlunoAsync(string nome, DateTime dataNascimento,
-            string? cpf = null, string? telCelular = null, string? email = null)
+        public async Task<Aluno> CriarAlunoAsync(AlunoDto alunoDto)
         {
-            var aluno = new Aluno(nome, dataNascimento, cpf, telCelular, email);
+            var aluno = new Aluno(
+                alunoDto.Nome,
+                alunoDto.DataNascimento,
+                alunoDto.Cpf,
+                alunoDto.TelCelular,
+                alunoDto.Email);
             await _repo.AddAsync(aluno);
             await _repo.SaveChangesAsync();
             return aluno;
         }
-
-        // public async Task ExcluirAlunoAsync(Guid id)
-        // {
-        //     var aluno = await _repo.GetByIdAsync(id) ?? throw new Exception("Aluno não encontrado");
-        //     await _repo.DeleteAsync(aluno);
-        // }
 
         public async Task ExcluirAlunoAsync(Aluno aluno)
         {
@@ -52,10 +50,7 @@ namespace kendo_londrina.Application.Services
             if (dto.Nome == null)
                 throw new Exception("Nome do aluno não pode ser nulo");
 
-            if (dto.DataNascimento == null)
-                throw new Exception("Data de nascimento do aluno não pode ser nula");
-
-            aluno.Atualizar(dto.Nome, dto.DataNascimento.Value,
+            aluno.Atualizar(dto.Nome, dto.DataNascimento,
                 dto.Cpf, dto.TelCelular, dto.Email,
                 dto.Nacionalidade, dto.UfNascimento, dto.CidadeNascimento,
                 dto.Sexo, dto.Rg, dto.Religiao);
