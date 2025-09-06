@@ -16,6 +16,7 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        builder.ApplyConfiguration(new PessoaConfig());
         builder.ApplyConfiguration(new AlunoConfig());
         builder.ApplyConfiguration(new MensalidadeConfig());
     }
