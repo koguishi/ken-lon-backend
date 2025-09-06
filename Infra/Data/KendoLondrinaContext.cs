@@ -9,6 +9,7 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
 {
     public KendoLondrinaContext(DbContextOptions<KendoLondrinaContext> options) : base(options) { }
 
+    public DbSet<Pessoa> Pessoas => Set<Pessoa>();
     public DbSet<Aluno> Alunos => Set<Aluno>();
     public DbSet<Mensalidade> Mensalidades => Set<Mensalidade>();
 

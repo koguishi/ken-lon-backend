@@ -46,10 +46,10 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null) return Unauthorized("Usuário não encontrado");
+        if (user == null) return Unauthorized("Usuário/Senha inválido");
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-        if (!result.Succeeded) return Unauthorized("Senha inválida");
+        if (!result.Succeeded) return Unauthorized("Usuário/Senha inválido");
 
         // Gerar token JWT
         var token = await GenerateJwtToken(user);

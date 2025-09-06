@@ -88,6 +88,9 @@ builder.Services.AddDbContext<KendoLondrinaContext>(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
+builder.Services.AddScoped<PessoaService>();
+
 builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
 builder.Services.AddScoped<AlunoService>();
 // builder.Services.AddScoped<IMensalidadeRepository, MensalidadeRepository>();
