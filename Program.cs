@@ -91,6 +91,12 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
 builder.Services.AddScoped<PessoaService>();
 
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<CategoriaService>();
+
+builder.Services.AddScoped<ISubCategoriaRepository, SubCategoriaRepository>();
+builder.Services.AddScoped<SubCategoriaService>();
+
 builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
 builder.Services.AddScoped<AlunoService>();
 // builder.Services.AddScoped<IMensalidadeRepository, MensalidadeRepository>();

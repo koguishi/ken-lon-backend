@@ -6,7 +6,7 @@ public class Categoria : Entity
 {
     public string Nome { get; private set; } = string.Empty;
     public string? Codigo { get; private set; } = string.Empty;
-    // virtual public IEnumerable<SubCategoria>? SubCategorias { get; private set; }    
+    virtual public IEnumerable<SubCategoria>? SubCategorias { get; private set; }    
 
     public Categoria(Guid userId, string nome,
         string? codigo = null)

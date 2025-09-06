@@ -10,6 +10,8 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
     public KendoLondrinaContext(DbContextOptions<KendoLondrinaContext> options) : base(options) { }
 
     public DbSet<Pessoa> Pessoas => Set<Pessoa>();
+    public DbSet<Categoria> Categorias => Set<Categoria>();
+    public DbSet<SubCategoria> SubCategorias => Set<SubCategoria>();
     public DbSet<Aluno> Alunos => Set<Aluno>();
     public DbSet<Mensalidade> Mensalidades => Set<Mensalidade>();
 
@@ -17,6 +19,9 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        builder.ApplyConfiguration(new PessoaConfig());
+        builder.ApplyConfiguration(new CategoriaConfig());
+        builder.ApplyConfiguration(new SubCategoriaConfig());
         builder.ApplyConfiguration(new PessoaConfig());
         builder.ApplyConfiguration(new AlunoConfig());
         builder.ApplyConfiguration(new MensalidadeConfig());

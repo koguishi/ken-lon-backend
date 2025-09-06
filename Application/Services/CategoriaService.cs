@@ -28,7 +28,9 @@ namespace kendo_londrina.Application.Services
 
         public async Task ExcluirCategoriaAsync(Categoria categoria)
         {
-            await _repo.DeleteAsync(_userId, categoria);
+            if (categoria.UserId != _userId)
+                throw new Exception("Erro de pertencimento");            
+            await _repo.DeleteAsync(categoria);
         }         
 
         public async Task<List<Categoria>> ListarCategoriasAsync()
