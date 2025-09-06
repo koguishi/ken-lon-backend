@@ -1,6 +1,6 @@
 using kendo_londrina.Application.Services;
 using kendo_londrina.Domain.Repositories;
-using kendo_londrina.Infra;
+using kendo_londrina.Infra.Data;
 using kendo_londrina.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 

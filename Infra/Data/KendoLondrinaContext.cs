@@ -2,7 +2,7 @@ using kendo_londrina.Domain.Entities;
 using kendo_londrina.Infra.Data.Config;
 using Microsoft.EntityFrameworkCore;
 
-namespace kendo_londrina.Infra;
+namespace kendo_londrina.Infra.Data;
 
 public class KendoLondrinaContext : DbContext
 {
