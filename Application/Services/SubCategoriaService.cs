@@ -7,20 +7,28 @@ namespace kendo_londrina.Application.Services
 {
     public class SubCategoriaService
     {
+        private readonly ICategoriaRepository _repoCategoria;
         private readonly ISubCategoriaRepository _repo;
         private readonly ICurrentUserService _currentUser;
         private readonly Guid _userId;
 
-        public SubCategoriaService(ISubCategoriaRepository repo, ICurrentUserService currentUser)
+        public SubCategoriaService(ICategoriaRepository repoCategoria,
+            ISubCategoriaRepository repo, ICurrentUserService currentUser)
         {
+            _repoCategoria = repoCategoria;
             _repo = repo;
             _currentUser = currentUser;
             _userId = Guid.Parse(_currentUser.UserId);
         }
 
-        public async Task<SubCategoria> CriarSubCategoriaAsync(SubCategoriaDto subCategoriaDto)
+        public async Task<SubCategoria> CriarSubCategoriaAsync(SubCategoriaDto dto)
         {
-            var subCategoria = new SubCategoria(_userId, subCategoriaDto.CategoriaId, subCategoriaDto.Nome, subCategoriaDto.Codigo);
+            var categoria = await _repoCategoria.GetByIdAsync(_userId, dto.CategoriaId);
+
+            if (categoria is null || categoria.UserId != _userId)
+                throw new Exception("Categoria não encontrada");
+
+            var subCategoria = new SubCategoria(_userId, dto.CategoriaId, dto.Nome, dto.Codigo);
             await _repo.AddAsync(subCategoria);
             await _repo.SaveChangesAsync();
             return subCategoria;

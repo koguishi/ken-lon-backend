@@ -51,7 +51,16 @@ public class SubCategoriasController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SubCategoria>> Create([FromBody] SubCategoriaDto dto)
     {
-        await _service.CriarSubCategoriaAsync(dto);
+        try
+        {
+            await _service.CriarSubCategoriaAsync(dto);
+        }
+        catch (System.Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound(new { message = ex.Message });
+            return BadRequest(new { message = ex.Message });
+        }
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
