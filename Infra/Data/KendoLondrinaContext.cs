@@ -1,10 +1,11 @@
 using kendo_londrina.Domain.Entities;
 using kendo_londrina.Infra.Data.Config;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace kendo_londrina.Infra.Data;
 
-public class KendoLondrinaContext : DbContext
+public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
 {
     public KendoLondrinaContext(DbContextOptions<KendoLondrinaContext> options) : base(options) { }
 

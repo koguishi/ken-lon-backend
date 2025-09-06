@@ -1,20 +1,35 @@
 using kendo_londrina.Application.DTOs;
 using kendo_londrina.Application.Services;
 using kendo_londrina.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace kendo_londrina.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AlunosController : ControllerBase
 {
 
+    private readonly ICurrentUserService _currentUser;    
     private readonly AlunoService _service;
-    public AlunosController(AlunoService service)
+    public AlunosController(ICurrentUserService currentUser,
+        AlunoService service)
     {
+        _currentUser = currentUser;        
         _service = service;
     }
+
+    [HttpGet("meus-dados")]
+    public IActionResult MeusDados()
+    {
+        var userId = _currentUser.UserId;
+        var email = _currentUser.Email;
+        var roles = _currentUser.Roles;
+
+        return Ok(new { userId, email, roles });
+    }    
 
     // [HttpGet("paginado")]
     [HttpGet]
