@@ -5,56 +5,56 @@ using kendo_londrina.Application.DTOs;
 
 namespace kendo_londrina.Application.Services
 {
-    public class CategoriaService
+    public class SubCategoriaService
     {
-        private readonly ICategoriaRepository _repo;
+        private readonly ISubCategoriaRepository _repo;
         private readonly ICurrentUserService _currentUser;
         private readonly Guid _userId;
 
-        public CategoriaService(ICategoriaRepository repo, ICurrentUserService currentUser)
+        public SubCategoriaService(ISubCategoriaRepository repo, ICurrentUserService currentUser)
         {
             _repo = repo;
             _currentUser = currentUser;
             _userId = Guid.Parse(_currentUser.UserId);
         }
 
-        public async Task<Categoria> CriarCategoriaAsync(CategoriaDto categoriaDto)
+        public async Task<SubCategoria> CriarSubCategoriaAsync(SubCategoriaDto subCategoriaDto)
         {
-            var categoria = new Categoria(_userId, categoriaDto.Nome, categoriaDto.Codigo);
-            await _repo.AddAsync(categoria);
+            var subCategoria = new SubCategoria(_userId, subCategoriaDto.CategoriaId, subCategoriaDto.Nome, subCategoriaDto.Codigo);
+            await _repo.AddAsync(subCategoria);
             await _repo.SaveChangesAsync();
-            return categoria;
+            return subCategoria;
         }
 
-        public async Task ExcluirCategoriaAsync(Categoria categoria)
+        public async Task ExcluirSubCategoriaAsync(SubCategoria subCategoria)
         {
-            await _repo.DeleteAsync(_userId, categoria);
+            await _repo.DeleteAsync(_userId, subCategoria);
         }         
 
-        public async Task<List<Categoria>> ListarCategoriasAsync()
+        public async Task<List<SubCategoria>> ListarSubCategoriasAsync()
         {
             return await _repo.GetAllAsync(_userId);
         }
 
-        public async Task<Categoria?> ObterPorIdAsync(Guid id)
+        public async Task<SubCategoria?> ObterPorIdAsync(Guid id)
         {
             return await _repo.GetByIdAsync(_userId, id);
         }
 
-        public async Task AtualizarCategoriaAsync(Guid id, CategoriaDto dto)
+        public async Task AtualizarSubCategoriaAsync(Guid id, SubCategoriaDto dto)
         {
-            var categoria = await _repo.GetByIdAsync(_userId, id)
-                ?? throw new Exception("Categoria não encontrada");
+            var subCategoria = await _repo.GetByIdAsync(_userId, id)
+                ?? throw new Exception("SubCategoria não encontrada");
 
             if (dto.Nome == null)
-                throw new Exception("Nome da categoria não pode ser nulo");
+                throw new Exception("Nome da subcategoria não pode ser nulo");
 
-            categoria.Atualizar(dto.Nome, dto.Codigo);
+            subCategoria.Atualizar(dto.Nome, dto.Codigo);
 
             await _repo.SaveChangesAsync();
         }
 
-        public async Task<(List<Categoria> Categorias, int Total)> ListarCategoriasPagAsync(
+        public async Task<(List<SubCategoria> SubCategorias, int Total)> ListarSubCategoriasPagAsync(
             int page = 1, int pageSize = 10, string? nome = null)
         {
             if (page < 1) page = 1;
@@ -66,13 +66,13 @@ namespace kendo_londrina.Application.Services
                 query = query.Where(a => a.Nome.Contains(nome));            
 
             var total = await query.CountAsync();
-            var categorias = await query
+            var subCategorias = await query
                 .OrderBy(a => a.Nome)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (categorias, total);
+            return (subCategorias, total);
         }        
     }
 }
