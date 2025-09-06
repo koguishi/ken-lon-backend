@@ -59,12 +59,16 @@ namespace kendo_londrina.Application.Services
         }
 
         public async Task<(List<Aluno> Alunos, int Total)> ListarAlunosPaginadosAsync(
-            int page = 1, int pageSize = 10)
+            int page = 1, int pageSize = 10, string? nome = null)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
             var query = _repo.Query(); // vamos criar Query() no repositório
+
+            if (!string.IsNullOrWhiteSpace(nome))
+                query = query.Where(a => a.Nome.Contains(nome));            
+
             var total = await query.CountAsync();
             var alunos = await query
                 .OrderBy(a => a.Nome)

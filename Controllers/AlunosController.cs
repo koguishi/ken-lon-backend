@@ -20,9 +20,10 @@ public class AlunosController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? nome = null)
     {
-        var (alunos, total) = await _service.ListarAlunosPaginadosAsync(page, pageSize);
+        var (alunos, total) = await _service.ListarAlunosPaginadosAsync(page, pageSize, nome);
 
         var totalPages = (int)Math.Ceiling(total / (double)pageSize);
         return Ok(new
@@ -31,7 +32,7 @@ public class AlunosController : ControllerBase
             totalPages,
             currentPage = page,
             pageSize,
-            data = alunos
+            alunos
         });
             
     }
