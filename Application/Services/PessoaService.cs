@@ -28,7 +28,9 @@ namespace kendo_londrina.Application.Services
 
         public async Task ExcluirPessoaAsync(Pessoa pessoa)
         {
-            await _repo.DeleteAsync(_userId, pessoa);
+            if (pessoa.UserId != _userId)
+                throw new Exception("Erro de pertencimento");            
+            await _repo.DeleteAsync(pessoa);
         }         
 
         public async Task<List<Pessoa>> ListarPessoasAsync()

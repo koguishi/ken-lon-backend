@@ -21,11 +21,9 @@ namespace kendo_londrina.Infrastructure.Repositories
 
         async Task<Pessoa?> IPessoaRepository.GetByIdAsync(Guid userId, Guid id)
         {
-            var pessoa = await _context.Pessoas.FindAsync(id);
-            if (pessoa == null || pessoa.UserId != userId)
-                return null;
-            if (pessoa.UserId != userId)
-                throw new Exception("Erro de pertencimento");            
+            var pessoa = await _context.Pessoas
+                .Where(p => p.UserId == userId && p.Id == id)
+                .FirstOrDefaultAsync();
             return pessoa;
         }
 
@@ -34,7 +32,7 @@ namespace kendo_londrina.Infrastructure.Repositories
             await _context.Pessoas.AddAsync(pessoa);
         }
 
-        public Task DeleteAsync(Guid userId, Pessoa pessoa)
+        public Task DeleteAsync(Pessoa pessoa)
         {
             _context.Pessoas.Remove(pessoa);
             return _context.SaveChangesAsync();

@@ -6,7 +6,7 @@ namespace kendo_londrina.Domain.Repositories
     {
         Task<Pessoa?> GetByIdAsync(Guid userId, Guid id);
         Task AddAsync(Pessoa pessoa);
-        Task DeleteAsync(Guid userId, Pessoa pessoa);
+        Task DeleteAsync(Pessoa pessoa);
         Task SaveChangesAsync();
         Task<List<Pessoa>> GetAllAsync(Guid userId);
         // DDD paginado
