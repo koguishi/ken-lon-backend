@@ -59,7 +59,16 @@ public class CategoriasController : ControllerBase
     [HttpPut("{id:Guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] CategoriaDto dto)
     {
-        await _service.AtualizarCategoriaAsync(id, dto);
+        try
+        {
+            await _service.AtualizarCategoriaAsync(id, dto);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound();
+            return BadRequest(new { message = ex.Message });
+        }
         return NoContent();
     }
 

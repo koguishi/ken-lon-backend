@@ -24,7 +24,7 @@ public class SubCategoriasController : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] string? nome = null)
     {
-        var (csubCtegorias, total) = await _service.ListarSubCategoriasPagAsync(page, pageSize, nome);
+        var (subCtegorias, total) = await _service.ListarSubCategoriasPagAsync(page, pageSize, nome);
 
         var totalPages = (int)Math.Ceiling(total / (double)pageSize);
         return Ok(new
@@ -33,7 +33,7 @@ public class SubCategoriasController : ControllerBase
             totalPages,
             currentPage = page,
             pageSize,
-            csubCtegorias
+            subCtegorias
         });
             
     }
@@ -55,10 +55,10 @@ public class SubCategoriasController : ControllerBase
         {
             await _service.CriarSubCategoriaAsync(dto);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             if (ex.Message.Contains("não encontrad"))
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = "Categoria não encontrada" });
             return BadRequest(new { message = ex.Message });
         }
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
@@ -68,7 +68,16 @@ public class SubCategoriasController : ControllerBase
     [HttpPut("{id:Guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] SubCategoriaDto dto)
     {
-        await _service.AtualizarSubCategoriaAsync(id, dto);
+        try
+        {
+            await _service.AtualizarSubCategoriaAsync(id, dto);    
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound();
+            return BadRequest(new { message = ex.Message });
+        }
         return NoContent();
     }
 

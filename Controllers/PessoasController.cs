@@ -59,13 +59,16 @@ public class PessoasController : ControllerBase
     [HttpPut("{id:Guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] PessoaDto dto)
     {
-        await _service.AtualizarPessoaAsync(id, new PessoaDto
+        try
         {
-            Nome = dto.Nome,
-            Codigo = dto.Codigo,
-            Cpf = dto.Cpf,
-            Cnpj = dto.Cnpj
-        });
+            await _service.AtualizarPessoaAsync(id, dto);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound();
+            return BadRequest(new { message = ex.Message });
+        }
         return NoContent();
     }
 
