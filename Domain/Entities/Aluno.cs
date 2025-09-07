@@ -1,4 +1,4 @@
-using kendo_londrina.Domain.Entities.AbstractClasses;
+using kendo_londrina.Domain.Entities.BaseClasses;
 
 namespace kendo_londrina.Domain.Entities;
 

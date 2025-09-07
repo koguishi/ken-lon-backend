@@ -8,7 +8,7 @@ namespace kendo_londrina.Infra.Data;
 public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
 {
     public KendoLondrinaContext(DbContextOptions<KendoLondrinaContext> options) : base(options) { }
-
+    public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Pessoa> Pessoas => Set<Pessoa>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<SubCategoria> SubCategorias => Set<SubCategoria>();
@@ -19,6 +19,7 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        builder.ApplyConfiguration(new EmpresaConfig());
         builder.ApplyConfiguration(new PessoaConfig());
         builder.ApplyConfiguration(new CategoriaConfig());
         builder.ApplyConfiguration(new SubCategoriaConfig());

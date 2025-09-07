@@ -1,3 +1,4 @@
+using kendo_londrina.Application.Services;
 using kendo_londrina.Infra.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,15 +11,17 @@ using System.Text;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    private readonly AuthService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IConfiguration _configuration;
 
-    public AuthController(
+    public AuthController(AuthService authService,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IConfiguration configuration)
     {
+        _authService = authService;
         _userManager = userManager;
         _signInManager = signInManager;
         _configuration = configuration;
@@ -35,6 +38,8 @@ public class AuthController : ControllerBase
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);
+
+        await _authService.CriarVincularEmpresaAsync(user.Id);
 
         if (result.Succeeded)
             return Ok("Usuário criado com sucesso");
