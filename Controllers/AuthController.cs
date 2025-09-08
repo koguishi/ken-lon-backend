@@ -1,5 +1,6 @@
 using kendo_londrina.Application.Services;
 using kendo_londrina.Infra.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -27,24 +28,49 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
+    [HttpPost("self-register")]
+    public async Task<IActionResult> SelfRegister([FromBody] RegisterDto dto)
+    {
+        try
+        {
+            await _authService.SelfRegisterUserAsync(dto.Email, dto.Password);
+            return Ok("Usuário criado com sucesso");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+        // var user = new ApplicationUser
+        // {
+        //     UserName = dto.Email,
+        //     Email = dto.Email,
+        //     // Nome = dto.Nome
+        // };
+
+        // var result = await _userManager.CreateAsync(user, dto.Password);
+
+        // await _authService.CriarVincularEmpresaAsync(user.Id);
+
+        // if (result.Succeeded)
+        //     return Ok("Usuário criado com sucesso");
+
+        // return BadRequest(result.Errors);
+    }
+
+    [Authorize(Policy = "EmpresaAdmin")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
-        var user = new ApplicationUser
+        try
         {
-            UserName = dto.Email,
-            Email = dto.Email,
-            // Nome = dto.Nome
-        };
-
-        var result = await _userManager.CreateAsync(user, dto.Password);
-
-        await _authService.CriarVincularEmpresaAsync(user.Id);
-
-        if (result.Succeeded)
+            await _authService.RegisterUserAsync(dto.Email, dto.Password);
             return Ok("Usuário criado com sucesso");
-
-        return BadRequest(result.Errors);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("login")]
@@ -72,9 +98,10 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            // new Claim("nome", user.Nome ?? "")
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            new("EmpresaId", user.EmpresaId?.ToString() ?? ""),
+            new("EmpresaRole", user.EmpresaRole ?? "")
         };
 
         // adicionar roles (se tiver)

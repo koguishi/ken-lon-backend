@@ -62,7 +62,14 @@ builder.Services.AddAuthentication(options =>
 
 
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(
+    options =>
+    {
+        // Policy que garante que só administradores de empresa tenham acesso
+        options.AddPolicy("EmpresaAdmin", policy =>
+        policy.RequireClaim("EmpresaRole", "Admin"));        
+    }
+);
 
 var frontendUrl = builder.Configuration["FRONTEND_URL"] ?? string.Empty;
 

@@ -7,6 +7,7 @@ public class ApplicationUser : IdentityUser
 {
     // Campos extras se precisar
     // public string? Nome { get; set; }
+    public string? EmpresaRole { get; set; }
     public Guid? EmpresaId { get; private set; }
     public Empresa? Empresa { get; private set; }
     public void VincularEmpresa(Guid empresaId)
