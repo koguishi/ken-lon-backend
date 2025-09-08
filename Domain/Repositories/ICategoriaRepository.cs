@@ -4,12 +4,12 @@ namespace kendo_londrina.Domain.Repositories
 {
     public interface ICategoriaRepository
     {
-        Task<Categoria?> GetByIdAsync(Guid userId, Guid id);
+        Task<Categoria?> GetByIdAsync(Guid empresaId, Guid id);
         Task AddAsync(Categoria categoria);
         Task DeleteAsync(Categoria categoria);
         Task SaveChangesAsync();
-        Task<List<Categoria>> GetAllAsync(Guid userId);
+        Task<List<Categoria>> GetAllAsync(Guid empresaId);
         // DDD paginado
-        IQueryable<Categoria> Query(Guid userId);        
+        IQueryable<Categoria> Query(Guid empresaId);        
     }
 }

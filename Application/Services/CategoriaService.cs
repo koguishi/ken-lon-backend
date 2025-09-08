@@ -9,18 +9,18 @@ namespace kendo_londrina.Application.Services
     {
         private readonly ICategoriaRepository _repo;
         private readonly ICurrentUserService _currentUser;
-        private readonly Guid _userId;
+        private readonly Guid _empresaId;
 
         public CategoriaService(ICategoriaRepository repo, ICurrentUserService currentUser)
         {
             _repo = repo;
             _currentUser = currentUser;
-            _userId = Guid.Parse(_currentUser.UserId);
+            _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
 
         public async Task<Categoria> CriarCategoriaAsync(CategoriaDto categoriaDto)
         {
-            var categoria = new Categoria(_userId, categoriaDto.Nome, categoriaDto.Codigo);
+            var categoria = new Categoria(_empresaId, categoriaDto.Nome, categoriaDto.Codigo);
             await _repo.AddAsync(categoria);
             await _repo.SaveChangesAsync();
             return categoria;
@@ -28,24 +28,24 @@ namespace kendo_londrina.Application.Services
 
         public async Task ExcluirCategoriaAsync(Categoria categoria)
         {
-            if (categoria.UserId != _userId)
+            if (categoria.EmpresaId != _empresaId)
                 throw new Exception("Erro de pertencimento");            
             await _repo.DeleteAsync(categoria);
         }         
 
         public async Task<List<Categoria>> ListarCategoriasAsync()
         {
-            return await _repo.GetAllAsync(_userId);
+            return await _repo.GetAllAsync(_empresaId);
         }
 
         public async Task<Categoria?> ObterPorIdAsync(Guid id)
         {
-            return await _repo.GetByIdAsync(_userId, id);
+            return await _repo.GetByIdAsync(_empresaId, id);
         }
 
         public async Task AtualizarCategoriaAsync(Guid id, CategoriaDto dto)
         {
-            var categoria = await _repo.GetByIdAsync(_userId, id)
+            var categoria = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Categoria não encontrada");
 
             if (dto.Nome == null)
@@ -62,7 +62,7 @@ namespace kendo_londrina.Application.Services
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
-            var query = _repo.Query(_userId); // vamos criar Query() no repositório
+            var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
 
             if (!string.IsNullOrWhiteSpace(nome))
                 query = query.Where(a => a.Nome.Contains(nome));            

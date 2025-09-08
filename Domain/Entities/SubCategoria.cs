@@ -12,12 +12,12 @@ public class SubCategoria : Entity
     // virtual public IEnumerable<ContaPagar>? ContasPagar { get; private set; }    
     // virtual public IEnumerable<ContaReceber>? ContasReceber { get; private set; }    
 
-    public SubCategoria(Guid userId,
+    public SubCategoria(Guid empresaId,
         Guid categoriaId,
         string nome,
         string? codigo = null)
     {
-        UserId = userId;
+        EmpresaId = empresaId;
         CategoriaId = categoriaId;
         Nome = nome;
         Codigo = codigo;

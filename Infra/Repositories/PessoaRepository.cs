@@ -19,10 +19,10 @@ namespace kendo_londrina.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        async Task<Pessoa?> IPessoaRepository.GetByIdAsync(Guid userId, Guid id)
+        async Task<Pessoa?> IPessoaRepository.GetByIdAsync(Guid empresaId, Guid id)
         {
             var pessoa = await _context.Pessoas
-                .Where(p => p.UserId == userId && p.Id == id)
+                .Where(p => p.EmpresaId == empresaId && p.Id == id)
                 .FirstOrDefaultAsync();
             return pessoa;
         }
@@ -38,14 +38,14 @@ namespace kendo_londrina.Infrastructure.Repositories
             return _context.SaveChangesAsync();
         }
 
-        Task<List<Pessoa>> IPessoaRepository.GetAllAsync(Guid userId)
+        Task<List<Pessoa>> IPessoaRepository.GetAllAsync(Guid empresaId)
         {
-            return _context.Pessoas.Where(p => p.UserId == userId).ToListAsync();
+            return _context.Pessoas.Where(p => p.EmpresaId == empresaId).ToListAsync();
         }
 
-        IQueryable<Pessoa> IPessoaRepository.Query(Guid userId)
+        IQueryable<Pessoa> IPessoaRepository.Query(Guid empresaId)
         {
-            return _context.Pessoas.Where(p => p.UserId == userId).AsQueryable();
+            return _context.Pessoas.Where(p => p.EmpresaId == empresaId).AsQueryable();
         }
     }
 }

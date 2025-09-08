@@ -19,10 +19,10 @@ namespace kendo_londrina.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<SubCategoria?> GetByIdAsync(Guid userId, Guid id)
+        public async Task<SubCategoria?> GetByIdAsync(Guid empresaId, Guid id)
         {
             var subCategoria = await _context.SubCategorias
-                .Where(p => p.UserId == userId && p.Id == id)
+                .Where(p => p.EmpresaId == empresaId && p.Id == id)
                 .FirstOrDefaultAsync();
             return subCategoria;
         }
@@ -38,14 +38,14 @@ namespace kendo_londrina.Infrastructure.Repositories
             return _context.SaveChangesAsync();
         }
 
-        Task<List<SubCategoria>> ISubCategoriaRepository.GetAllAsync(Guid userId)
+        Task<List<SubCategoria>> ISubCategoriaRepository.GetAllAsync(Guid empresaId)
         {
-            return _context.SubCategorias.Where(p => p.UserId == userId).ToListAsync();
+            return _context.SubCategorias.Where(p => p.EmpresaId == empresaId).ToListAsync();
         }
 
-        IQueryable<SubCategoria> ISubCategoriaRepository.Query(Guid userId)
+        IQueryable<SubCategoria> ISubCategoriaRepository.Query(Guid empresaId)
         {
-            return _context.SubCategorias.Where(p => p.UserId == userId).AsQueryable();
+            return _context.SubCategorias.Where(p => p.EmpresaId == empresaId).AsQueryable();
         }
     }
 }

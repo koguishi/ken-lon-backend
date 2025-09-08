@@ -9,18 +9,18 @@ namespace kendo_londrina.Application.Services
     {
         private readonly IPessoaRepository _repo;
         private readonly ICurrentUserService _currentUser;
-        private readonly Guid _userId;
+        private readonly Guid _empresaId;
 
         public PessoaService(IPessoaRepository repo, ICurrentUserService currentUser)
         {
             _repo = repo;
             _currentUser = currentUser;
-            _userId = Guid.Parse(_currentUser.UserId);
+            _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
 
         public async Task<Pessoa> CriarPessoaAsync(PessoaDto pessoaDto)
         {
-            var pessoa = new Pessoa(_userId, pessoaDto.Nome, pessoaDto.Codigo, pessoaDto.Cpf, pessoaDto.Cnpj);
+            var pessoa = new Pessoa(_empresaId, pessoaDto.Nome, pessoaDto.Codigo, pessoaDto.Cpf, pessoaDto.Cnpj);
             await _repo.AddAsync(pessoa);
             await _repo.SaveChangesAsync();
             return pessoa;
@@ -28,24 +28,24 @@ namespace kendo_londrina.Application.Services
 
         public async Task ExcluirPessoaAsync(Pessoa pessoa)
         {
-            if (pessoa.UserId != _userId)
+            if (pessoa.EmpresaId != _empresaId)
                 throw new Exception("Erro de pertencimento");            
             await _repo.DeleteAsync(pessoa);
         }         
 
         public async Task<List<Pessoa>> ListarPessoasAsync()
         {
-            return await _repo.GetAllAsync(_userId);
+            return await _repo.GetAllAsync(_empresaId);
         }
 
         public async Task<Pessoa?> ObterPorIdAsync(Guid id)
         {
-            return await _repo.GetByIdAsync(_userId, id);
+            return await _repo.GetByIdAsync(_empresaId, id);
         }
 
         public async Task AtualizarPessoaAsync(Guid id, PessoaDto dto)
         {
-            var pessoa = await _repo.GetByIdAsync(_userId, id)
+            var pessoa = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Pessoa não encontrado");
 
             if (dto.Nome == null)
@@ -62,7 +62,7 @@ namespace kendo_londrina.Application.Services
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
-            var query = _repo.Query(_userId); // vamos criar Query() no repositório
+            var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
 
             if (!string.IsNullOrWhiteSpace(nome))
                 query = query.Where(a => a.Nome.Contains(nome));            

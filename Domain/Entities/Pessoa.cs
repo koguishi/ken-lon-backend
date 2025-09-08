@@ -11,12 +11,12 @@ public class Pessoa : Entity
     // virtual public IEnumerable<ContaPagar>? ContasPagar { get; private set; }    
     // virtual public IEnumerable<ContaReceber>? ContasReceber { get; private set; }    
 
-    public Pessoa(Guid userId, string nome,
+    public Pessoa(Guid empresaId, string nome,
         string? codigo = null,
         string? cpf = null,
         string? cnpj = null)
     {
-        UserId = userId;
+        EmpresaId = empresaId;
         Nome = nome;
         Codigo = codigo;
         Cpf = cpf;

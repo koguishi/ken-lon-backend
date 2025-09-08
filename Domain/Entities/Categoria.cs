@@ -8,10 +8,10 @@ public class Categoria : Entity
     public string? Codigo { get; private set; } = string.Empty;
     virtual public IEnumerable<SubCategoria>? SubCategorias { get; private set; }    
 
-    public Categoria(Guid userId, string nome,
+    public Categoria(Guid empresaId, string nome,
         string? codigo = null)
     {
-        UserId = userId;
+        EmpresaId = empresaId;
         Nome = nome;
         Codigo = codigo;
     }
