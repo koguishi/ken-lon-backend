@@ -22,9 +22,14 @@ public class SubCategoriaConfig : IEntityTypeConfiguration<SubCategoria>
 
         builder.ToTable("SubCategorias");
 
+        builder.HasOne(p => p.Empresa)
+            .WithMany(e => e.SubCategorias)
+            .HasForeignKey(p => p.EmpresaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne(c => c.Categoria)
             .WithMany(c => c.SubCategorias)
             .HasForeignKey(m => m.CategoriaId)
-            .OnDelete(DeleteBehavior.Restrict);                
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

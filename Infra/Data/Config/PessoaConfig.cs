@@ -31,5 +31,10 @@ public class PessoaConfig : IEntityTypeConfiguration<Pessoa>
             .IsRequired(false);
 
         builder.ToTable("Pessoas");
+
+        builder.HasOne(p => p.Empresa)
+            .WithMany(e => e.Pessoas)
+            .HasForeignKey(p => p.EmpresaId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

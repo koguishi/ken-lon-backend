@@ -21,5 +21,10 @@ public class CategoriaConfig : IEntityTypeConfiguration<Categoria>
             .IsRequired(false);
 
         builder.ToTable("Categorias");
+
+        builder.HasOne(p => p.Empresa)
+            .WithMany(e => e.Categorias)
+            .HasForeignKey(p => p.EmpresaId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -19,6 +19,9 @@ public class Empresa
     public DateTime? CreatedOn { get; private set; }
     public string? EditedBy { get; private set; }
     public DateTime? EditedOn { get; private set; }
+    virtual public IEnumerable<Pessoa>? Pessoas { get; private set; }
+    virtual public IEnumerable<Categoria>? Categorias { get; private set; }
+    virtual public IEnumerable<SubCategoria>? SubCategorias { get; private set; }
 
     public Empresa(string nomeFantasia,
         string uf, string cidade)
