@@ -122,7 +122,7 @@ public class AuthController : ControllerBase
 
 public class RegisterDto
 {
-    public required string Nome { get; set; }
+    // public required string Nome { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
 }
