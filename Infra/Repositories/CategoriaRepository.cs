@@ -22,6 +22,7 @@ namespace kendo_londrina.Infrastructure.Repositories
         async Task<Categoria?> ICategoriaRepository.GetByIdAsync(Guid empresaId, Guid id)
         {
             var categoria = await _context.Categorias
+                .Include(c => c.SubCategorias) // Inclui as SubCategorias na consulta
                 .Where(p => p.EmpresaId == empresaId && p.Id == id)
                 .FirstOrDefaultAsync();
             return categoria;
@@ -40,12 +41,16 @@ namespace kendo_londrina.Infrastructure.Repositories
 
         Task<List<Categoria>> ICategoriaRepository.GetAllAsync(Guid empresaId)
         {
-            return _context.Categorias.Where(p => p.EmpresaId == empresaId).ToListAsync();
+            return _context.Categorias
+                .Include(c => c.SubCategorias) // Inclui as SubCategorias na consulta
+                .Where(p => p.EmpresaId == empresaId).ToListAsync();
         }
 
         IQueryable<Categoria> ICategoriaRepository.Query(Guid empresaId)
         {
-            return _context.Categorias.Where(p => p.EmpresaId == empresaId).AsQueryable();
+            return _context.Categorias
+                .Include(c => c.SubCategorias) // Inclui as SubCategorias na consulta
+                .Where(p => p.EmpresaId == empresaId).AsQueryable();
         }
     }
 }

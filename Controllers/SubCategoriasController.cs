@@ -53,7 +53,7 @@ public class SubCategoriasController : ControllerBase
     {
         try
         {
-            await _service.CriarSubCategoriaAsync(dto);
+            // await _service.CriarSubCategoriaAsync(dto);
         }
         catch (Exception ex)
         {

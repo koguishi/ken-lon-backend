@@ -21,18 +21,18 @@ namespace kendo_londrina.Application.Services
             _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
 
-        public async Task<SubCategoria> CriarSubCategoriaAsync(SubCategoriaDto dto)
-        {
-            var categoria = await _repoCategoria.GetByIdAsync(_empresaId, dto.CategoriaId);
+        // public async Task<SubCategoria> CriarSubCategoriaAsync(SubCategoriaDto dto)
+        // {
+        //     var categoria = await _repoCategoria.GetByIdAsync(_empresaId, dto.CategoriaId);
 
-            if (categoria is null || categoria.EmpresaId != _empresaId)
-                throw new Exception("Categoria não encontrada");
+        //     if (categoria is null || categoria.EmpresaId != _empresaId)
+        //         throw new Exception("Categoria não encontrada");
 
-            var subCategoria = new SubCategoria(_empresaId, dto.CategoriaId, dto.Nome, dto.Codigo);
-            await _repo.AddAsync(subCategoria);
-            await _repo.SaveChangesAsync();
-            return subCategoria;
-        }
+        //     var subCategoria = new SubCategoria(_empresaId, dto.CategoriaId, dto.Nome, dto.Codigo);
+        //     await _repo.AddAsync(subCategoria);
+        //     await _repo.SaveChangesAsync();
+        //     return subCategoria;
+        // }
 
         public async Task ExcluirSubCategoriaAsync(SubCategoria subCategoria)
         {
