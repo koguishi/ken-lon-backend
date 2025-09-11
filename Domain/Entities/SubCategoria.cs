@@ -7,10 +7,7 @@ public class SubCategoria : Entity
     public Guid CategoriaId { get; private set; }    
     public string Nome { get; private set; } = string.Empty;
     public string? Codigo { get; private set; } = string.Empty;
-    virtual public Categoria? Categoria { get; private set; }    
-
-    // virtual public IEnumerable<ContaPagar>? ContasPagar { get; private set; }    
-    // virtual public IEnumerable<ContaReceber>? ContasReceber { get; private set; }    
+    virtual public Categoria? Categoria { get; private set; }
 
     public SubCategoria(Guid empresaId,
         Guid categoriaId,

@@ -2,18 +2,26 @@ using Microsoft.EntityFrameworkCore;
 using kendo_londrina.Domain.Entities;
 using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Application.DTOs;
+using kendo_londrina.Infra.Data;
 
 namespace kendo_londrina.Application.Services
 {
     public class CategoriaService
     {
+        private readonly KendoLondrinaContext _context;
         private readonly ICategoriaRepository _repo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUser;
         private readonly Guid _empresaId;
 
-        public CategoriaService(ICategoriaRepository repo, ICurrentUserService currentUser)
+        public CategoriaService(KendoLondrinaContext context
+            , ICategoriaRepository repo
+            , IUnitOfWork unitOfWork
+            , ICurrentUserService currentUser)
         {
+            _context = context;
             _repo = repo;
+            _unitOfWork = unitOfWork;
             _currentUser = currentUser;
             _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
@@ -67,12 +75,46 @@ namespace kendo_londrina.Application.Services
             var categoria = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Categoria não encontrada");
 
-            if (dto.Nome == null)
-                throw new Exception("Nome da categoria não pode ser nulo");
+            // TODO: transferir a validação para o domínio
+            // if (dto.Nome == null)
+            //     throw new Exception("Nome da categoria não pode ser nulo");
 
-            categoria.Atualizar(dto.Nome, ToSubCategorias(categoria.Id, dto.SubCategorias), dto.Codigo);
+            // Atualiza os dados da categoria
+            categoria.Atualizar(dto.Nome, dto.Codigo);
 
-            await _repo.SaveChangesAsync();
+            // Subcategorias atuais no banco
+            var existentes = categoria.SubCategorias.ToList();
+
+            // Subcategorias que vieram no DTO
+            var novas = dto.SubCategorias;
+
+            // Remover as que não estão mais presentes
+            foreach (var existente in existentes)
+            {
+                if (!novas.Any(s => s.Id == existente.Id))
+                    categoria.ExcluirSubcategoria(existente.Id);
+            }
+
+            // inserir e atualizar as que vieram no DTO
+            foreach (var nova in novas)
+            {
+                var existente = existentes.FirstOrDefault(s => s.Id == nova.Id);
+                if (existente == null)
+                {
+                    // Novo registro
+                    var subCategoria = categoria.AdicionarSubcategoria(nova.Nome);
+
+                    // explicitamente State = Added
+                    // para evitar Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException
+                    _context.Entry(subCategoria).State = EntityState.Added;
+                }
+                else
+                {
+                    // Atualiza existente
+                    categoria.AlterarSubcategoria(existente.Id, nova.Nome);
+                }
+            }
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task<(List<CategoriaDto> Categorias, int Total)> ListarCategoriasPagAsync(
@@ -115,8 +157,10 @@ namespace kendo_londrina.Application.Services
                 Nome = categoria.Nome,
                 SubCategorias = [.. categoria.SubCategorias.Select(s => new SubCategoriaDto
                 {
+                    CategoriaId = s.CategoriaId,
                     Id = s.Id,
-                    Nome = s.Nome
+                    Nome = s.Nome,
+                    Codigo = s.Codigo
                 })]
             };
         }

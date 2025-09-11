@@ -34,55 +34,55 @@ namespace kendo_londrina.Application.Services
         //     return subCategoria;
         // }
 
-        public async Task ExcluirSubCategoriaAsync(SubCategoria subCategoria)
-        {
-            if (subCategoria.EmpresaId != _empresaId)
-                throw new Exception("Erro de pertencimento");            
-            await _repo.DeleteAsync(subCategoria);
-        }         
+        // public async Task ExcluirSubCategoriaAsync(SubCategoria subCategoria)
+        // {
+        //     if (subCategoria.EmpresaId != _empresaId)
+        //         throw new Exception("Erro de pertencimento");            
+        //     await _repo.DeleteAsync(subCategoria);
+        // }         
 
-        public async Task<List<SubCategoria>> ListarSubCategoriasAsync()
-        {
-            return await _repo.GetAllAsync(_empresaId);
-        }
+        // public async Task<List<SubCategoria>> ListarSubCategoriasAsync()
+        // {
+        //     return await _repo.GetAllAsync(_empresaId);
+        // }
 
-        public async Task<SubCategoria?> ObterPorIdAsync(Guid id)
-        {
-            return await _repo.GetByIdAsync(_empresaId, id);
-        }
+        // public async Task<SubCategoria?> ObterPorIdAsync(Guid id)
+        // {
+        //     return await _repo.GetByIdAsync(_empresaId, id);
+        // }
 
-        public async Task AtualizarSubCategoriaAsync(Guid id, SubCategoriaDto dto)
-        {
-            var subCategoria = await _repo.GetByIdAsync(_empresaId, id)
-                ?? throw new Exception("SubCategoria não encontrada");
+        // public async Task AtualizarSubCategoriaAsync(Guid id, SubCategoriaDto dto)
+        // {
+        //     var subCategoria = await _repo.GetByIdAsync(_empresaId, id)
+        //         ?? throw new Exception("SubCategoria não encontrada");
 
-            if (dto.Nome == null)
-                throw new Exception("Nome da subcategoria não pode ser nulo");
+        //     if (dto.Nome == null)
+        //         throw new Exception("Nome da subcategoria não pode ser nulo");
 
-            subCategoria.Atualizar(dto.Nome, dto.Codigo);
+        //     subCategoria.Atualizar(dto.Nome, dto.Codigo);
 
-            await _repo.SaveChangesAsync();
-        }
+        //     await _repo.SaveChangesAsync();
+        // }
 
-        public async Task<(List<SubCategoria> SubCategorias, int Total)> ListarSubCategoriasPagAsync(
-            int page = 1, int pageSize = 10, string? nome = null)
-        {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 10;
+        // public async Task<(List<SubCategoria> SubCategorias, int Total)> ListarSubCategoriasPagAsync(
+        //     int page = 1, int pageSize = 10, string? nome = null)
+        // {
+        //     if (page < 1) page = 1;
+        //     if (pageSize < 1) pageSize = 10;
 
-            var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
+        //     var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
 
-            if (!string.IsNullOrWhiteSpace(nome))
-                query = query.Where(a => a.Nome.Contains(nome));            
+        //     if (!string.IsNullOrWhiteSpace(nome))
+        //         query = query.Where(a => a.Nome.Contains(nome));            
 
-            var total = await query.CountAsync();
-            var subCategorias = await query
-                .OrderBy(a => a.Nome)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+        //     var total = await query.CountAsync();
+        //     var subCategorias = await query
+        //         .OrderBy(a => a.Nome)
+        //         .Skip((page - 1) * pageSize)
+        //         .Take(pageSize)
+        //         .ToListAsync();
 
-            return (subCategorias, total);
-        }        
+        //     return (subCategorias, total);
+        // }        
     }
 }

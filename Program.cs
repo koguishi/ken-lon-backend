@@ -37,30 +37,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
-
-    // Habilita eventos para debug
-    // options.Events = new JwtBearerEvents
-    // {
-    //     OnAuthenticationFailed = context =>
-    //     {
-    //         Console.WriteLine("Auth Failed: " + context.Exception.Message);
-    //         return Task.CompletedTask;
-    //     },
-    //     OnTokenValidated = context =>
-    //     {
-    //         Console.WriteLine("Token Validado com sucesso: " +
-    //             context.Principal.Identity.Name);
-    //         return Task.CompletedTask;
-    //     },
-    //     OnChallenge = context =>
-    //     {
-    //         Console.WriteLine("OnChallenge: " + context.ErrorDescription);
-    //         return Task.CompletedTask;
-    //     }
-    // };
 });
-
-
 
 builder.Services.AddAuthorization(
     options =>
@@ -96,6 +73,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 builder.Services.AddScoped<AuthService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 // builder.Services.AddScoped<EmpresaService>();

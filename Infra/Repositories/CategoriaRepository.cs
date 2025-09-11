@@ -19,7 +19,7 @@ namespace kendo_londrina.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        async Task<Categoria?> ICategoriaRepository.GetByIdAsync(Guid empresaId, Guid id)
+        public async Task<Categoria?> GetByIdAsync(Guid empresaId, Guid id)
         {
             var categoria = await _context.Categorias
                 .Include(c => c.SubCategorias) // Inclui as SubCategorias na consulta
