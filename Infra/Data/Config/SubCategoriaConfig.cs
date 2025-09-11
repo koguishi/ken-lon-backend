@@ -30,6 +30,6 @@ public class SubCategoriaConfig : IEntityTypeConfiguration<SubCategoria>
         builder.HasOne(c => c.Categoria)
             .WithMany(c => c.SubCategorias)
             .HasForeignKey(m => m.CategoriaId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

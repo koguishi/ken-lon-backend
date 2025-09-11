@@ -40,8 +40,10 @@ namespace kendo_londrina.Application.Services
             return categoria;
         }
 
-        public async Task ExcluirCategoriaAsync(Categoria categoria)
+        public async Task ExcluirCategoriaAsync(Guid id)
         {
+            var categoria = await _repo.GetByIdAsync(_empresaId, id)
+                ?? throw new Exception("Categoria não encontrada");
             if (categoria.EmpresaId != _empresaId)
                 throw new Exception("Erro de pertencimento");
             await _repo.DeleteAsync(categoria);
@@ -53,9 +55,11 @@ namespace kendo_londrina.Application.Services
             return ToCategoriasDto(categorias);
         }
 
-        public async Task<Categoria?> ObterPorIdAsync(Guid id)
+        public async Task<CategoriaDto?> ObterPorIdAsync(Guid id)
         {
-            return await _repo.GetByIdAsync(_empresaId, id);
+            var categoria = await _repo.GetByIdAsync(_empresaId, id)
+                ?? null;
+            return ToCategoriaDto(categoria!);
         }
 
         public async Task AtualizarCategoriaAsync(Guid id, CategoriaDto dto)
@@ -96,20 +100,25 @@ namespace kendo_londrina.Application.Services
         private static List<CategoriaDto> ToCategoriasDto(List<Categoria> categorias)
         {
             var categoriasDto = new List<CategoriaDto>();
-            categorias.ForEach(categoria =>
-            {
-                categoriasDto.Add(new CategoriaDto
-                {
-                    Id = categoria.Id,
-                    Nome = categoria.Nome,
-                    SubCategorias = [.. categoria.SubCategorias.Select(s => new SubCategoriaDto
-                    {
-                        Id = s.Id,
-                        Nome = s.Nome
-                    })]
-                });
+            categorias.ForEach(categoria => {
+                categoriasDto.Add(ToCategoriaDto(categoria));
             });
             return categoriasDto;
+        }
+
+        private static CategoriaDto ToCategoriaDto(Categoria? categoria)
+        {
+            if (categoria == null) return null!;
+            return new CategoriaDto
+            {
+                Id = categoria.Id,
+                Nome = categoria.Nome,
+                SubCategorias = [.. categoria.SubCategorias.Select(s => new SubCategoriaDto
+                {
+                    Id = s.Id,
+                    Nome = s.Nome
+                })]
+            };
         }
     }
 }

@@ -76,10 +76,16 @@ public class CategoriasController : ControllerBase
     [HttpDelete("{id:Guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var categoria = await _service.ObterPorIdAsync(id);
-        if (categoria is null) return NotFound();
-        await _service.ExcluirCategoriaAsync(categoria);
-
+        try
+        {
+            await _service.ExcluirCategoriaAsync(id);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound();
+            return BadRequest(new { message = ex.Message });
+        }
         return NoContent();
     }
 }
