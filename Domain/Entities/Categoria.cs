@@ -6,8 +6,9 @@ public class Categoria : Entity
 {
     public string Nome { get; private set; } = string.Empty;
     public string? Codigo { get; private set; } = string.Empty;
-    //virtual public IEnumerable<SubCategoria>? SubCategorias { get; private set; }
-    public ICollection<SubCategoria> SubCategorias { get; private set; } = [];
+    virtual public ICollection<SubCategoria>? SubCategorias { get; private set; } = [];
+    virtual public ICollection<ContaPagar>? ContasPagar { get; private set; }    
+    virtual public ICollection<ContaReceber>? ContasReceber { get; private set; }    
 
     public Categoria(Guid empresaId, string nome,
         ICollection<SubCategoria>? subCategorias = null,
@@ -34,6 +35,7 @@ public class Categoria : Entity
     {
         if (string.IsNullOrWhiteSpace(nome))
             throw new DomainException("Nome da subcategoria inválido");
+        SubCategorias ??= [];
         if (SubCategorias.Any(s => s.Nome == nome))
             throw new DomainException("Subcategoria já existe");
         var subCategoria = new SubCategoria(EmpresaId, Id, nome);
@@ -43,6 +45,7 @@ public class Categoria : Entity
 
     public void ExcluirSubcategoria(Guid subId)
     {
+        SubCategorias ??= [];
         var sub = SubCategorias.FirstOrDefault(s => s.Id == subId);
         if (sub != null) SubCategorias.Remove(sub);
     }
@@ -51,6 +54,7 @@ public class Categoria : Entity
     {
         if (string.IsNullOrWhiteSpace(nome))
             throw new DomainException("Nome da subcategoria inválido");
+        SubCategorias ??= [];
         var sub = SubCategorias.FirstOrDefault(s => s.Id == subId)
             ?? throw new DomainException("Subcategoria não encontrada");
         sub.Atualizar(nome);

@@ -22,6 +22,8 @@ public class Empresa
     virtual public IEnumerable<Pessoa>? Pessoas { get; private set; }
     virtual public IEnumerable<Categoria>? Categorias { get; private set; }
     virtual public IEnumerable<SubCategoria>? SubCategorias { get; private set; }
+    virtual public IEnumerable<ContaPagar>? ContasPagar { get; private set; }
+    virtual public IEnumerable<ContaReceber>? ContasReceber { get; private set; }
 
     public Empresa(string nomeFantasia,
         string uf, string cidade)

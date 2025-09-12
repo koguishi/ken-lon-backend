@@ -12,6 +12,9 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
     public DbSet<Pessoa> Pessoas => Set<Pessoa>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<SubCategoria> SubCategorias => Set<SubCategoria>();
+    public DbSet<ContaPagar> ContasPagar => Set<ContaPagar>();
+    public DbSet<ContaReceber> ContasReceber => Set<ContaReceber>();
+
     public DbSet<Aluno> Alunos => Set<Aluno>();
     public DbSet<Mensalidade> Mensalidades => Set<Mensalidade>();
 
@@ -23,7 +26,9 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
         builder.ApplyConfiguration(new PessoaConfig());
         builder.ApplyConfiguration(new CategoriaConfig());
         builder.ApplyConfiguration(new SubCategoriaConfig());
-        builder.ApplyConfiguration(new PessoaConfig());
+        builder.ApplyConfiguration(new ContaPagarConfig());
+        builder.ApplyConfiguration(new ContaReceberConfig());
+
         builder.ApplyConfiguration(new AlunoConfig());
         builder.ApplyConfiguration(new MensalidadeConfig());
     }

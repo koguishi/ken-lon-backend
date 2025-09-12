@@ -8,8 +8,8 @@ public class Pessoa : Entity
     public string? Codigo { get; private set; } = string.Empty;
     public string? Cpf { get; private set; }
     public string? Cnpj { get; private set; }
-    // virtual public IEnumerable<ContaPagar>? ContasPagar { get; private set; }    
-    // virtual public IEnumerable<ContaReceber>? ContasReceber { get; private set; }    
+    virtual public ICollection<ContaPagar>? ContasPagar { get; private set; }    
+    virtual public ICollection<ContaReceber>? ContasReceber { get; private set; }    
 
     public Pessoa(Guid empresaId, string nome,
         string? codigo = null,

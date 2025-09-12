@@ -18,9 +18,9 @@ public class ContaPagar : Entity
     public string? MotivoExclusao { get; private set; }
 
     // Chaves Estrangeiras (IDs) - Tornadas "nullable" para o seu requisito
-    public int? PessoaId { get; private set; }
-    public int? CategoriaId { get; private set; }
-    public int? SubcategoriaId { get; private set; }
+    public Guid? PessoaId { get; private set; }
+    public Guid? CategoriaId { get; private set; }
+    public Guid? SubCategoriaId { get; private set; }
 
     // Propriedades de Navegação
     virtual public Pessoa? Pessoa { get; private set; }

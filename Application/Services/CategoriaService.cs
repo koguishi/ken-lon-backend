@@ -71,7 +71,7 @@ namespace kendo_londrina.Application.Services
             categoria.Atualizar(dto.Nome, dto.Codigo);
 
             // Subcategorias atuais no banco
-            var existentes = categoria.SubCategorias.ToList();
+            var existentes = (categoria.SubCategorias == null) ? [] : categoria.SubCategorias.ToList();
 
             // Subcategorias que vieram no DTO
             var novas = dto.SubCategorias;
@@ -143,7 +143,8 @@ namespace kendo_londrina.Application.Services
             {
                 Id = categoria.Id,
                 Nome = categoria.Nome,
-                SubCategorias = [.. categoria.SubCategorias.Select(s => new SubCategoriaDto
+                SubCategorias = (categoria.SubCategorias == null)
+                ? [] : [.. categoria.SubCategorias.Select(s => new SubCategoriaDto
                 {
                     CategoriaId = s.CategoriaId,
                     Id = s.Id,

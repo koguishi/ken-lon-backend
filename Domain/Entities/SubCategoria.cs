@@ -8,6 +8,8 @@ public class SubCategoria : Entity
     public string Nome { get; private set; } = string.Empty;
     public string? Codigo { get; private set; } = string.Empty;
     virtual public Categoria? Categoria { get; private set; }
+    virtual public ICollection<ContaPagar>? ContasPagar { get; private set; }    
+    virtual public ICollection<ContaReceber>? ContasReceber { get; private set; }    
 
     public SubCategoria(Guid empresaId,
         Guid categoriaId,
