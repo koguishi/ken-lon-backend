@@ -47,7 +47,8 @@ namespace kendo_londrina.Infrastructure.Repositories
         IQueryable<ContaPagar> IContaPagarRepository.Query(Guid empresaId)
         {
             return _context.ContasPagar
-                .Where(p => p.EmpresaId == empresaId).AsQueryable();
+                .Where(p => p.EmpresaId == empresaId && p.Excluido == false)
+                .AsQueryable();
         }
     }
 }
