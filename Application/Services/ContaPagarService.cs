@@ -55,7 +55,7 @@ namespace kendo_londrina.Application.Services
             await _repo.SaveChangesAsync();
         }
 
-        public async Task<(List<ContaPagar> ContasPagar, int Total)> ContasPagarAsync(
+        public async Task<(List<ContaPagar> ContasPagar, int Total)> ListarContasPagarPaginadoAsync(
             bool? pago, int page = 1, int pageSize = 10)
         {
             if (page < 1) page = 1;
