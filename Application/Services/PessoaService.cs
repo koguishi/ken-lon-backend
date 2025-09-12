@@ -26,10 +26,10 @@ namespace kendo_londrina.Application.Services
             return pessoa;
         }
 
-        public async Task ExcluirPessoaAsync(Pessoa pessoa)
+        public async Task ExcluirPessoaAsync(Guid id)
         {
-            if (pessoa.EmpresaId != _empresaId)
-                throw new Exception("Erro de pertencimento");            
+            var pessoa = await _repo.GetByIdAsync(_empresaId, id)
+                ?? throw new Exception("Pessoa não encontrada");
             await _repo.DeleteAsync(pessoa);
         }         
 
