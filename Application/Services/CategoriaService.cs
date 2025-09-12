@@ -26,18 +26,6 @@ namespace kendo_londrina.Application.Services
             _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
 
-        private List<SubCategoria> ToSubCategorias(
-            Guid categoriaId, List<SubCategoriaDto> subCategoriasDto)
-        {
-            var subCategorias = new List<SubCategoria>();
-            foreach (var subCatDto in subCategoriasDto)
-            {
-                var subCat = new SubCategoria(_empresaId, categoriaId, subCatDto.Nome, subCatDto.Codigo);
-                subCategorias.Add(subCat);
-            }
-            return subCategorias;
-        }
-
         public async Task<Categoria> CriarCategoriaAsync(CategoriaDto categoriaDto)
         {
             var categoria = new Categoria(_empresaId, categoriaDto.Nome);
