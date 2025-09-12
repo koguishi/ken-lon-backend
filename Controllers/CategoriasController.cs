@@ -51,7 +51,14 @@ public class CategoriasController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Categoria>> Create([FromBody] CategoriaDto categoria)
     {
-        await _service.CriarCategoriaAsync(categoria);
+        try
+        {
+            await _service.CriarCategoriaAsync(categoria);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
         return CreatedAtAction(nameof(GetById), new { id = categoria.Id }, categoria);
     }
 
@@ -67,7 +74,7 @@ public class CategoriasController : ControllerBase
         {
             if (ex.Message.Contains("não encontrad"))
                 return NotFound();
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(ex.Message);
         }
         return NoContent();
     }

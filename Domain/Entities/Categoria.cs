@@ -33,7 +33,7 @@ public class Categoria : Entity
     public SubCategoria AdicionarSubcategoria(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new DomainException("Nome inválido");
+            throw new DomainException("Nome da subcategoria inválido");
         if (SubCategorias.Any(s => s.Nome == nome))
             throw new DomainException("Subcategoria já existe");
         var subCategoria = new SubCategoria(EmpresaId, Id, nome);
@@ -50,7 +50,7 @@ public class Categoria : Entity
     public void AlterarSubcategoria(Guid subId, string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new DomainException("Nome inválido");
+            throw new DomainException("Nome da subcategoria inválido");
         var sub = SubCategorias.FirstOrDefault(s => s.Id == subId)
             ?? throw new DomainException("Subcategoria não encontrada");
         sub.Atualizar(nome);
