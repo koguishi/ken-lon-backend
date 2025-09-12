@@ -40,8 +40,6 @@ namespace kendo_londrina.Application.Services
         {
             var categoria = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Categoria não encontrada");
-            if (categoria.EmpresaId != _empresaId)
-                throw new Exception("Erro de pertencimento");
             await _repo.DeleteAsync(categoria);
         }
 
