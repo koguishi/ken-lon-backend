@@ -1,3 +1,4 @@
+using kendo_londrina.Application.DTOs;
 using kendo_londrina.Domain.Entities.BaseClasses;
 
 namespace kendo_londrina.Domain.Entities;
@@ -26,6 +27,28 @@ public class ContaPagar : Entity
     virtual public Pessoa? Pessoa { get; private set; }
     virtual public Categoria? Categoria { get; private set; }
     virtual public SubCategoria? SubCategoria { get; private set; }
+
+    // Construtor vazio para EF Core
+    private ContaPagar() { }
+
+    public ContaPagar(
+        Guid empresaId, decimal valor, DateTime vencimento, string? observacao = "")
+    {
+        EmpresaId = empresaId;
+        Valor = valor;
+        Vencimento = vencimento;
+        Observacao = observacao ?? null; 
+    }    
+
+    public void Alterar(decimal valor, DateTime vencimento, string? observacao = "")
+    {
+        if (Excluido) throw new DomainException("Não é possível alterar uma conta excluída.");
+        if (Pago) throw new DomainException("Não é possível alterar um conta paga.");
+        Valor = valor;
+        Vencimento = vencimento;
+        if (observacao != null)
+            Observacao = observacao;
+    }
 
     public void RegistrarPagamento(string meio, string? obs)
     {
