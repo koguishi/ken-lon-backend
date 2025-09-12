@@ -78,7 +78,7 @@ public class PessoasController : ControllerBase
     {
         var pessoa = await _service.ObterPorIdAsync(id);
         if (pessoa is null) return NotFound();
-        await _service.ExcluirPessoaAsync(pessoa);
+        await _service.ExcluirPessoaAsync(pessoa.Id);
 
         return NoContent();
     }
