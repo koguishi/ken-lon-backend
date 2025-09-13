@@ -49,7 +49,7 @@ public class ContaReceber : Entity
     }
 
     public void Alterar(decimal valor, DateTime vencimento
-        , string descricao
+        , string? descricao
         , string? observacao = ""
         , Guid? pessoaId = null, Guid? categoriaId = null, Guid? subCategoriaId = null)
     {
