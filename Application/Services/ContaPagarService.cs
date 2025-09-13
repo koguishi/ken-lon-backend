@@ -133,6 +133,7 @@ namespace kendo_londrina.Application.Services
                 Id = contaPagar.Id,
                 Valor = contaPagar.Valor,
                 Vencimento = contaPagar.Vencimento,
+                Descricao = contaPagar.Descricao,
                 Observacao = contaPagar.Observacao,
                 Pago = contaPagar.Pago,
                 DataPagamento = contaPagar.DataPagamento,
