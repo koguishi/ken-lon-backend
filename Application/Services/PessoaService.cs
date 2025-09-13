@@ -30,6 +30,14 @@ namespace kendo_londrina.Application.Services
         {
             var pessoa = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Pessoa não encontrada");
+
+            await _repo.LoadContasPagarAsync(pessoa);
+            if (pessoa.ContasPagar!.Count > 0)
+                throw new Exception("Pessoa tem contas a pagar vinculadas");
+            await _repo.LoadContasReceberAsync(pessoa);
+            if (pessoa.ContasReceber!.Count > 0)
+                throw new Exception("Pessoa tem contas a receber vinculadas");
+
             await _repo.DeleteAsync(pessoa);
         }
 

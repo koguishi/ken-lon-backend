@@ -47,5 +47,19 @@ namespace kendo_londrina.Infrastructure.Repositories
         {
             return _context.Pessoas.Where(p => p.EmpresaId == empresaId).AsQueryable();
         }
+
+        public async Task LoadContasPagarAsync(Pessoa pessoa)
+        {
+            await _context.Entry(pessoa)
+                .Collection(t => t.ContasPagar!)
+                .LoadAsync();
+        }
+
+        public async Task LoadContasReceberAsync(Pessoa pessoa)
+        {
+            await _context.Entry(pessoa)
+                .Collection(t => t.ContasReceber!)
+                .LoadAsync();
+        }
     }
 }

@@ -71,10 +71,17 @@ public class PessoasController(PessoaService service) : ControllerBase
     [HttpDelete("{id:Guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var pessoa = await _service.ObterPorIdAsync(id);
-        if (pessoa is null || !pessoa.Id.HasValue) return NotFound();
-        await _service.ExcluirPessoaAsync(pessoa.Id.Value);
-
+        try
+        {
+            var pessoa = await _service.ObterPorIdAsync(id);
+            if (pessoa is null || !pessoa.Id.HasValue)
+                return NotFound();
+            await _service.ExcluirPessoaAsync(pessoa.Id.Value);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
         return NoContent();
     }
 }
