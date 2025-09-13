@@ -1,6 +1,5 @@
 using kendo_londrina.Application.DTOs;
 using kendo_londrina.Application.Services;
-using kendo_londrina.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,7 +39,7 @@ public class CategoriasController : ControllerBase
 
     // GET: api/categorias/5
     [HttpGet("{id:Guid}")]
-    public async Task<ActionResult<Categoria>> GetById(Guid id)
+    public async Task<ActionResult<CategoriaDto>> GetById(Guid id)
     {
         var categoria = await _service.ObterPorIdAsync(id);
         if (categoria is null) return NotFound();
@@ -49,17 +48,18 @@ public class CategoriasController : ControllerBase
 
     // POST: api/categorias
     [HttpPost]
-    public async Task<ActionResult<Categoria>> Create([FromBody] CategoriaDto categoria)
+    public async Task<ActionResult<CategoriaDto>> Create([FromBody] CategoriaDto dto)
     {
         try
         {
-            await _service.CriarCategoriaAsync(categoria);
+            var categoria = await _service.CriarCategoriaAsync(dto);
+            dto.Id = categoria.Id;
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
-        return CreatedAtAction(nameof(GetById), new { id = categoria.Id }, categoria);
+        return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     // PUT: api/categorias/5

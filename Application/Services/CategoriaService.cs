@@ -8,6 +8,9 @@ namespace kendo_londrina.Application.Services
 {
     public class CategoriaService
     {
+        // para evitar Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException
+        // o contexto é usado na alteração da Categoria com a inclusão de uma nova SubCategoria
+        //  _context.Entry(subCategoria).State = EntityState.Added;
         private readonly KendoLondrinaContext _context;
         private readonly ICategoriaRepository _repo;
         private readonly IUnitOfWork _unitOfWork;
@@ -26,14 +29,14 @@ namespace kendo_londrina.Application.Services
             _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
 
-        public async Task<Categoria> CriarCategoriaAsync(CategoriaDto categoriaDto)
+        public async Task<CategoriaDto> CriarCategoriaAsync(CategoriaDto categoriaDto)
         {
             var categoria = new Categoria(_empresaId, categoriaDto.Nome);
             categoriaDto.SubCategorias.ForEach(s =>
                 categoria.AdicionarSubcategoria(s.Nome));
             await _repo.AddAsync(categoria);
             await _repo.SaveChangesAsync();
-            return categoria;
+            return ToCategoriaDto(categoria);
         }
 
         public async Task ExcluirCategoriaAsync(Guid id)
