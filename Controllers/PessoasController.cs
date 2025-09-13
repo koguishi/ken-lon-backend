@@ -1,6 +1,5 @@
 using kendo_londrina.Application.DTOs;
 using kendo_londrina.Application.Services;
-using kendo_londrina.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,7 +35,7 @@ public class PessoasController(PessoaService service) : ControllerBase
 
     // GET: api/pessoas/5
     [HttpGet("{id:Guid}")]
-    public async Task<ActionResult<Pessoa>> GetById(Guid id)
+    public async Task<ActionResult<PessoaDto>> GetById(Guid id)
     {
         var pessoa = await _service.ObterPorIdAsync(id);
         if (pessoa is null) return NotFound();
@@ -45,7 +44,7 @@ public class PessoasController(PessoaService service) : ControllerBase
 
     // POST: api/pessoas
     [HttpPost]
-    public async Task<ActionResult<Pessoa>> Create([FromBody] PessoaDto pessoa)
+    public async Task<ActionResult<PessoaDto>> Create([FromBody] PessoaDto pessoa)
     {
         await _service.CriarPessoaAsync(pessoa);
         return CreatedAtAction(nameof(GetById), new { id = pessoa.Id }, pessoa);
@@ -62,8 +61,8 @@ public class PessoasController(PessoaService service) : ControllerBase
         catch (Exception ex)
         {
             if (ex.Message.Contains("não encontrad"))
-                return NotFound();
-            return BadRequest(new { message = ex.Message });
+                return NotFound(ex.Message);
+            return BadRequest(ex.Message);
         }
         return NoContent();
     }
@@ -73,8 +72,8 @@ public class PessoasController(PessoaService service) : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var pessoa = await _service.ObterPorIdAsync(id);
-        if (pessoa is null) return NotFound();
-        await _service.ExcluirPessoaAsync(pessoa.Id);
+        if (pessoa is null || !pessoa.Id.HasValue) return NotFound();
+        await _service.ExcluirPessoaAsync(pessoa.Id.Value);
 
         return NoContent();
     }

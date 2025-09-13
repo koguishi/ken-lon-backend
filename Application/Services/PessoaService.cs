@@ -18,12 +18,12 @@ namespace kendo_londrina.Application.Services
             _empresaId = Guid.Parse(_currentUser.EmpresaId!);
         }
 
-        public async Task<Pessoa> CriarPessoaAsync(PessoaDto pessoaDto)
+        public async Task<PessoaDto> CriarPessoaAsync(PessoaDto pessoaDto)
         {
             var pessoa = new Pessoa(_empresaId, pessoaDto.Nome, pessoaDto.Codigo, pessoaDto.Cpf, pessoaDto.Cnpj);
             await _repo.AddAsync(pessoa);
             await _repo.SaveChangesAsync();
-            return pessoa;
+            return ToPessoaDto(pessoa);
         }
 
         public async Task ExcluirPessoaAsync(Guid id)
@@ -31,16 +31,18 @@ namespace kendo_londrina.Application.Services
             var pessoa = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Pessoa não encontrada");
             await _repo.DeleteAsync(pessoa);
-        }         
-
-        public async Task<List<Pessoa>> ListarPessoasAsync()
-        {
-            return await _repo.GetAllAsync(_empresaId);
         }
 
-        public async Task<Pessoa?> ObterPorIdAsync(Guid id)
+        public async Task<List<PessoaDto>> ListarPessoasAsync()
         {
-            return await _repo.GetByIdAsync(_empresaId, id);
+            var pessoas = await _repo.GetAllAsync(_empresaId);
+            return ToPessoasDto(pessoas);
+        }
+
+        public async Task<PessoaDto?> ObterPorIdAsync(Guid id)
+        {
+            var pessoa = await _repo.GetByIdAsync(_empresaId, id);
+            return ToPessoaDto(pessoa);
         }
 
         public async Task AtualizarPessoaAsync(Guid id, PessoaDto dto)
@@ -48,6 +50,7 @@ namespace kendo_londrina.Application.Services
             var pessoa = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Pessoa não encontrado");
 
+            // TODO: fazer esta validação no Domain
             if (dto.Nome == null)
                 throw new Exception("Nome do pessoa não pode ser nulo");
 
@@ -56,7 +59,7 @@ namespace kendo_londrina.Application.Services
             await _repo.SaveChangesAsync();
         }
 
-        public async Task<(List<Pessoa> Pessoas, int Total)> ListarPessoasPagAsync(
+        public async Task<(List<PessoaDto> Pessoas, int Total)> ListarPessoasPagAsync(
             int page = 1, int pageSize = 10, string? nome = null)
         {
             if (page < 1) page = 1;
@@ -65,7 +68,7 @@ namespace kendo_londrina.Application.Services
             var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
 
             if (!string.IsNullOrWhiteSpace(nome))
-                query = query.Where(a => a.Nome.Contains(nome));            
+                query = query.Where(a => a.Nome.Contains(nome));
 
             var total = await query.CountAsync();
             var pessoas = await query
@@ -74,7 +77,30 @@ namespace kendo_londrina.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (pessoas, total);
-        }        
+            return (ToPessoasDto(pessoas), total);
+        }
+        
+        private static List<PessoaDto> ToPessoasDto(List<Pessoa> pessoas)
+        {
+            var pessoasDto = new List<PessoaDto>();
+            pessoas.ForEach(pessoa =>
+            {
+                pessoasDto.Add(ToPessoaDto(pessoa));
+            });
+            return pessoasDto;
+        }
+
+        private static PessoaDto ToPessoaDto(Pessoa? pessoa)
+        {
+            if (pessoa == null) return null!;
+            return new PessoaDto
+            {
+                Id = pessoa.Id,
+                Nome = pessoa.Nome,
+                Codigo = pessoa.Codigo,
+                Cpf = pessoa.Cpf,
+                Cnpj = pessoa.Cnpj,
+            };
+        }
     }
 }
