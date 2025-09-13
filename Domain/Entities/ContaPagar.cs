@@ -31,16 +31,25 @@ public class ContaPagar : Entity
     // Construtor vazio para EF Core
     private ContaPagar() { }
 
-    public ContaPagar(
-        Guid empresaId, decimal valor, DateTime vencimento, string? observacao = "")
+    public ContaPagar(Guid empresaId
+        , decimal valor
+        , DateTime vencimento
+        , string? observacao = ""
+        , Guid? pessoaId = null
+        , Guid? categoriaId = null
+        , Guid? subCategoriaId = null)
     {
         EmpresaId = empresaId;
         Valor = valor;
         Vencimento = vencimento;
-        Observacao = observacao ?? null; 
-    }    
+        Observacao = observacao ?? null;
+        PessoaId = pessoaId ?? null;
+        CategoriaId = categoriaId ?? null;
+        SubCategoriaId = subCategoriaId ?? null;
+    }
 
-    public void Alterar(decimal valor, DateTime vencimento, string? observacao = "")
+    public void Alterar(decimal valor, DateTime vencimento, string? observacao = ""
+        , Guid? pessoaId = null, Guid? categoriaId = null, Guid? subCategoriaId = null)
     {
         if (Excluido) throw new DomainException("Não é possível alterar uma conta excluída.");
         if (Pago) throw new DomainException("Não é possível alterar um conta paga.");
@@ -48,6 +57,9 @@ public class ContaPagar : Entity
         Vencimento = vencimento;
         if (observacao != null)
             Observacao = observacao;
+        PessoaId = pessoaId ?? null;
+        CategoriaId = categoriaId ?? null;
+        SubCategoriaId = subCategoriaId ?? null;
     }
 
     public void RegistrarPagamento(string meio, string? obs)

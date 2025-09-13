@@ -41,7 +41,7 @@ private readonly ContaPagarService _service;
 
     // GET: api/contaspagar/5
     [HttpGet("{id:Guid}")]
-    public async Task<ActionResult<ContaPagar>> GetById(Guid id)
+    public async Task<ActionResult<ContaPagarDto>> GetById(Guid id)
     {
         var conta = await _service.ObterPorIdAsync(id);
         if (conta is null) return NotFound();
@@ -50,15 +50,18 @@ private readonly ContaPagarService _service;
 
     // POST: api/contaspagar
     [HttpPost]
-    public async Task<ActionResult<ContaPagar>> Create([FromBody] ContaPagarDto dto)
+    public async Task<ActionResult<ContaPagarDto>> Create([FromBody] ContaPagarDto dto)
     {
         try
         {
-            await _service.CriarContaPagarAsync(dto);
+            var conta = await _service.CriarContaPagarAsync(dto);
+            dto.Id = conta.Id;
         }
         catch (Exception ex)
         {
-            return BadRequest(new { message = ex.Message });
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound(ex.Message);
+            return BadRequest(ex.Message);
         }
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
@@ -69,12 +72,12 @@ private readonly ContaPagarService _service;
     {
         try
         {
-            await _service.AtualizarContaPagarAsync(id, dto);
+            await _service.AlterarContaPagarAsync(id, dto);
         }
         catch (Exception ex)
         {
             if (ex.Message.Contains("não encontrad"))
-                return NotFound();
+                return NotFound(ex.Message);
             return BadRequest(ex.Message);
         }
         return NoContent();
