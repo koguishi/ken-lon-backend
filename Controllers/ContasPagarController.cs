@@ -10,8 +10,7 @@ namespace kendo_londrina.Controllers;
 [Route("api/[controller]")]
 public class ContasPagarController : ControllerBase
 {
-
-private readonly ContaPagarService _service;
+    private readonly ContaPagarService _service;
     public ContasPagarController(ContaPagarService service)
     {
         _service = service;
