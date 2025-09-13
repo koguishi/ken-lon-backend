@@ -9,14 +9,10 @@ namespace kendo_londrina.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class PessoasController : ControllerBase
+public class PessoasController(PessoaService service) : ControllerBase
 {
 
-    private readonly PessoaService _service;
-    public PessoasController(PessoaService service)
-    {
-        _service = service;
-    }
+    private readonly PessoaService _service = service;
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
