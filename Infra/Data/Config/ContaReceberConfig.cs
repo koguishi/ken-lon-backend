@@ -15,6 +15,10 @@ public class ContaReceberConfig : IEntityTypeConfiguration<ContaReceber>
         builder.Property(c => c.Vencimento)
             .HasColumnType("date")
             .IsRequired();
+        builder.Property(c => c.Descricao)
+            .HasColumnType("nvarchar")
+            .HasMaxLength(100)
+            .IsRequired(false);
         builder.Property(c => c.Observacao)
             .HasColumnType("nvarchar")
             .HasMaxLength(2000)
