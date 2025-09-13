@@ -2,6 +2,7 @@ namespace kendo_londrina.Application.DTOs;
 
 public class ContaPagarDto
 {
+    public string? Descricao { get; set; }
     public Guid? Id { get; set; }
     public decimal Valor { get; set; }
     public DateTime Vencimento { get; set; }

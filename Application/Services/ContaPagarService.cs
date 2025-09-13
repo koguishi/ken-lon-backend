@@ -52,6 +52,7 @@ namespace kendo_londrina.Application.Services
             var contaPagar = new ContaPagar(_empresaId
                 , dto.Valor
                 , dto.Vencimento
+                , dto.Descricao
                 , dto.Observacao
                 , dto.PessoaId
                 , dto.CategoriaId
@@ -89,7 +90,7 @@ namespace kendo_londrina.Application.Services
             var contaPagar = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Pagar não encontrada");
 
-            contaPagar.Alterar(dto.Valor, dto.Vencimento, dto.Observacao
+            contaPagar.Alterar(dto.Valor, dto.Vencimento, dto.Descricao, dto.Observacao
                 , dto.PessoaId, dto.CategoriaId, dto.SubCategoriaId);
             await _repo.SaveChangesAsync();
         }

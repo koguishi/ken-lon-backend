@@ -5,6 +5,7 @@ namespace kendo_londrina.Domain.Entities;
 
 public class ContaPagar : Entity
 {
+    public string? Descricao { get; private set; }
     public decimal Valor { get; private set; }
     public DateTime Vencimento { get; private set; }
     public string? Observacao { get; private set; }
@@ -32,13 +33,13 @@ public class ContaPagar : Entity
     private ContaPagar() { }
 
     public ContaPagar(Guid empresaId
-        , decimal valor
-        , DateTime vencimento
-        , string? observacao = ""
+        , decimal valor, DateTime vencimento
+        , string? descricao, string? observacao = ""
         , Guid? pessoaId = null
         , Guid? categoriaId = null
         , Guid? subCategoriaId = null)
     {
+        Descricao = descricao;
         EmpresaId = empresaId;
         Valor = valor;
         Vencimento = vencimento;
@@ -48,11 +49,13 @@ public class ContaPagar : Entity
         SubCategoriaId = subCategoriaId ?? null;
     }
 
-    public void Alterar(decimal valor, DateTime vencimento, string? observacao = ""
+    public void Alterar(decimal valor, DateTime vencimento
+        , string? descricao, string? observacao = ""
         , Guid? pessoaId = null, Guid? categoriaId = null, Guid? subCategoriaId = null)
     {
         if (Excluido) throw new DomainException("Não é possível alterar uma conta excluída.");
         if (Pago) throw new DomainException("Não é possível alterar um conta paga.");
+        Descricao = descricao;
         Valor = valor;
         Vencimento = vencimento;
         if (observacao != null)
