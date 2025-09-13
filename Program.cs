@@ -86,7 +86,6 @@ builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<CategoriaService>();
 
 builder.Services.AddScoped<ISubCategoriaRepository, SubCategoriaRepository>();
-builder.Services.AddScoped<SubCategoriaService>();
 
 builder.Services.AddScoped<IContaPagarRepository, ContaPagarRepository>();
 builder.Services.AddScoped<ContaPagarService>();
