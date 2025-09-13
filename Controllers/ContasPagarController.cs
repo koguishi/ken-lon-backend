@@ -1,6 +1,5 @@
 using kendo_londrina.Application.DTOs;
 using kendo_londrina.Application.Services;
-using kendo_londrina.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
