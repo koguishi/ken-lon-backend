@@ -8,6 +8,7 @@ namespace kendo_londrina.Infra.Data;
 public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
 {
     public KendoLondrinaContext(DbContextOptions<KendoLondrinaContext> options) : base(options) { }
+    public DbSet<AuditoriaEntry> AuditoriaEntries => Set<AuditoriaEntry>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Pessoa> Pessoas => Set<Pessoa>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
