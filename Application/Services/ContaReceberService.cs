@@ -12,17 +12,20 @@ namespace kendo_londrina.Application.Services
         private readonly ICategoriaRepository _repoCategoria;
         private readonly ICurrentUserService _currentUser;
         private readonly Guid _empresaId;
+        private readonly AuditoriaService _auditoriaService;
 
         public ContaReceberService(IContaReceberRepository repo
             , IPessoaRepository repoPessoa
             , ICategoriaRepository repoCategoria
-            , ICurrentUserService currentUser)
+            , ICurrentUserService currentUser
+            , AuditoriaService auditoriaService)
         {
             _repo = repo;
             _repoPessoa = repoPessoa;
             _repoCategoria = repoCategoria;
             _currentUser = currentUser;
             _empresaId = Guid.Parse(_currentUser.EmpresaId!);
+            _auditoriaService = auditoriaService;
         }
 
         private async Task VerificarVinculos(ContaReceberDto dto)
@@ -59,8 +62,12 @@ namespace kendo_londrina.Application.Services
                 , dto.SubCategoriaId
             );
             await _repo.AddAsync(contaReceber);
+
+            var contaInseridaDto = ConvertToDto(contaReceber);
+            await _auditoriaService.LogAsync(contaInseridaDto, "inseriu");
+
             await _repo.SaveChangesAsync();
-            return ConvertToDto(contaReceber);
+            return contaInseridaDto;
         }
 
         public async Task ExcluirContaReceberAsync(Guid id)
