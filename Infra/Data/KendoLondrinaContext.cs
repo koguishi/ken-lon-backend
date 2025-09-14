@@ -23,6 +23,7 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        builder.ApplyConfiguration(new AuditoriaEntryConfig());
         builder.ApplyConfiguration(new EmpresaConfig());
         builder.ApplyConfiguration(new PessoaConfig());
         builder.ApplyConfiguration(new CategoriaConfig());
