@@ -90,6 +90,9 @@ builder.Services.AddScoped<ISubCategoriaRepository, SubCategoriaRepository>();
 builder.Services.AddScoped<IContaPagarRepository, ContaPagarRepository>();
 builder.Services.AddScoped<ContaPagarService>();
 
+builder.Services.AddScoped<IContaReceberRepository, ContaReceberRepository>();
+builder.Services.AddScoped<ContaReceberService>();
+
 builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
 builder.Services.AddScoped<AlunoService>();
 // builder.Services.AddScoped<IMensalidadeRepository, MensalidadeRepository>();

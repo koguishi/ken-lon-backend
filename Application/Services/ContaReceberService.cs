@@ -147,5 +147,24 @@ namespace kendo_londrina.Application.Services
                 SubCategoriaId = contaReceber.SubCategoriaId,
             };
         }
+
+        public async Task RegistrarRecebimentoAsync(Guid id, RegistrarRecebimentoDto dto)
+        {
+            var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
+                ?? throw new Exception("Conta a Receber não encontrada");
+
+            contaReceber.RegistrarRecebimento(dto.MeioRecebimento
+                , dto.DataRecebimento, dto.ObsRecebimento);
+            await _repo.SaveChangesAsync();
+        }
+
+        public async Task EstornarRecebimentoAsync(Guid id, EstornarRecebimentoDto dto)
+        {
+            var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
+                ?? throw new Exception("Conta a Receber não encontrada");
+
+            contaReceber.EstornarRecebimento(dto.Observacao);
+            await _repo.SaveChangesAsync();
+        }
     }
 }

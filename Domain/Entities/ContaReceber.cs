@@ -65,12 +65,24 @@ public class ContaReceber : Entity
         SubCategoriaId = subCategoriaId ?? null;
     }
 
-    public void RegistrarRecebimento(string meio, string? obs)
+    public void RegistrarRecebimento(string meio, DateTime dataRecebimento, string? obs)
     {
         if (Excluido) throw new DomainException("Não é possível receber uma conta excluída.");
-        DataRecebimento = DateTime.Now;
+        if (Recebido) throw new DomainException("Não é possível receber uma conta já recebida.");
+        Recebido = true;
+        DataRecebimento = dataRecebimento;
         MeioRecebimento = meio;
         ObsRecebimento = obs;
+    }
+
+    public void EstornarRecebimento(string? obs)
+    {
+        if (Excluido) throw new DomainException("Não é possível estornar recebimento de uma conta excluída.");
+        if (!Recebido) throw new DomainException("Não é possível estornar recebimento de uma conta não recebida.");
+        Recebido = false;
+        DataRecebimento = null;
+        MeioRecebimento = null;
+        ObsRecebimento = null;
     }
 
     public void Excluir(string motivo)

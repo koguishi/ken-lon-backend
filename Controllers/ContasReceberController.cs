@@ -30,7 +30,6 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
             pageSize,
             contas
         });
-            
     }
 
     // GET: api/contasreceber/5
@@ -93,4 +92,39 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
         }
         return NoContent();
     }
+
+    // PATCH: api/contasreceber/5
+    [HttpPatch("registrar-recebimento/{id:Guid}")]
+    public async Task<IActionResult> RegistrarRecebimento(Guid id, [FromBody] RegistrarRecebimentoDto dto)
+    {
+        try
+        {
+            await _service.RegistrarRecebimentoAsync(id, dto);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound(ex.Message);
+            return BadRequest(ex.Message);
+        }
+        return NoContent();
+    }
+    
+    // PATCH: api/contasreceber/5
+    [HttpPatch("estornar-recebimento/{id:Guid}")]
+    public async Task<IActionResult> EstornarRecebimento(Guid id, [FromBody] EstornarRecebimentoDto dto)
+    {
+        try
+        {
+            await _service.EstornarRecebimentoAsync(id, dto);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound(ex.Message);
+            return BadRequest(ex.Message);
+        }
+        return NoContent();
+    }
+
 }
