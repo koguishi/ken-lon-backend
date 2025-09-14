@@ -1,3 +1,4 @@
+using kendo_londrina.Infra.Auditoria;
 public class AuditoriaEntry
 {
     public Guid Id { get; set; }

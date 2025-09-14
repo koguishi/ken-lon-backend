@@ -1,12 +1,13 @@
+using System.Text;
 using kendo_londrina.Application.Services;
 using kendo_londrina.Domain.Repositories;
+using kendo_londrina.Infra.Auditoria;
 using kendo_londrina.Infra.Data;
 using kendo_londrina.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,9 +76,10 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
-// builder.Services.AddScoped<EmpresaService>();
+
+builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+builder.Services.AddScoped<AuditoriaService>();
 
 builder.Services.AddScoped<IPessoaRepository, PessoaRepository>();
 builder.Services.AddScoped<PessoaService>();
