@@ -52,12 +52,12 @@ public class CategoriasController : ControllerBase
     {
         try
         {
-            var categoria = await _service.CriarCategoriaAsync(dto);
+            var categoria = await _service.CriarCategoriaAsync(dto, HttpContext.RequestAborted);
             dto.Id = categoria.Id;
         }
         catch (Exception ex)
         {
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(ex.Message);
         }
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
@@ -68,7 +68,7 @@ public class CategoriasController : ControllerBase
     {
         try
         {
-            await _service.AtualizarCategoriaAsync(id, dto);
+            await _service.AtualizarCategoriaAsync(id, dto, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
@@ -85,13 +85,13 @@ public class CategoriasController : ControllerBase
     {
         try
         {
-            await _service.ExcluirCategoriaAsync(id);
+            await _service.ExcluirCategoriaAsync(id, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
             if (ex.Message.Contains("não encontrad"))
                 return NotFound();
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(ex.Message);
         }
         return NoContent();
     }
