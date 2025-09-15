@@ -178,8 +178,16 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
+            var dadosAntes = ToDto(contaReceber);
+
             contaReceber.RegistrarRecebimento(dto.MeioRecebimento
                 , dto.DataRecebimento, dto.ObsRecebimento);
+
+            await _auditoriaService.LogAsync(
+                typeof(ContaReceber).Name,
+                "Registrou Recebimento",
+                dto,
+                dadosAntes);
             await _repo.SaveChangesAsync();
         }
 
@@ -188,7 +196,15 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
+            var dadosAntes = ToDto(contaReceber);
+
             contaReceber.EstornarRecebimento(dto.Observacao);
+
+            await _auditoriaService.LogAsync(
+                typeof(ContaReceber).Name,
+                "Estornou Recebimento",
+                dto,
+                dadosAntes);
             await _repo.SaveChangesAsync();
         }
     }
