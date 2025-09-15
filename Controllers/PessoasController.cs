@@ -44,10 +44,18 @@ public class PessoasController(PessoaService service) : ControllerBase
 
     // POST: api/pessoas
     [HttpPost]
-    public async Task<ActionResult<PessoaDto>> Create([FromBody] PessoaDto pessoa)
+    public async Task<ActionResult<PessoaDto>> Create([FromBody] PessoaDto dto)
     {
-        await _service.CriarPessoaAsync(pessoa);
-        return CreatedAtAction(nameof(GetById), new { id = pessoa.Id }, pessoa);
+        try
+        {
+            var pessoa = await _service.CriarPessoaAsync(dto, HttpContext.RequestAborted);
+            dto.Id = pessoa.Id;
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     // PUT: api/pessoas/5
@@ -56,7 +64,7 @@ public class PessoasController(PessoaService service) : ControllerBase
     {
         try
         {
-            await _service.AtualizarPessoaAsync(id, dto);
+            await _service.AtualizarPessoaAsync(id, dto, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
@@ -76,7 +84,7 @@ public class PessoasController(PessoaService service) : ControllerBase
             var pessoa = await _service.ObterPorIdAsync(id);
             if (pessoa is null || !pessoa.Id.HasValue)
                 return NotFound();
-            await _service.ExcluirPessoaAsync(pessoa.Id.Value);
+            await _service.ExcluirPessoaAsync(pessoa.Id.Value, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
