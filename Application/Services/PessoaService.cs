@@ -1,70 +1,97 @@
-using Microsoft.EntityFrameworkCore;
-using kendo_londrina.Domain.Entities;
-using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Application.DTOs;
+using kendo_londrina.Domain.Entities;
+using kendo_londrina.Infra.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace kendo_londrina.Application.Services
 {
     public class PessoaService
     {
-        private readonly IPessoaRepository _repo;
-        private readonly ICurrentUserService _currentUser;
+        private readonly IUnitOfWork _uow;
         private readonly Guid _empresaId;
 
-        public PessoaService(IPessoaRepository repo, ICurrentUserService currentUser)
+        public PessoaService(IUnitOfWork uow, ICurrentUserService currentUser)
         {
-            _repo = repo;
-            _currentUser = currentUser;
-            _empresaId = Guid.Parse(_currentUser.EmpresaId!);
+            _uow = uow;
+            _empresaId = Guid.Parse(currentUser.EmpresaId!);
         }
 
-        public async Task<PessoaDto> CriarPessoaAsync(PessoaDto pessoaDto)
+        public async Task<PessoaDto> CriarPessoaAsync(PessoaDto pessoaDto, CancellationToken cancellationToken)
         {
             var pessoa = new Pessoa(_empresaId, pessoaDto.Nome, pessoaDto.Codigo, pessoaDto.Cpf, pessoaDto.Cnpj);
-            await _repo.AddAsync(pessoa);
-            await _repo.SaveChangesAsync();
-            return ToPessoaDto(pessoa);
+            var pessoaInseridaDto = ToPessoaDto(pessoa);
+            await _uow.BeginTransactionAsync();
+            await _uow.Pessoas.AddAsync(pessoa);
+            await _uow.Pessoas.SaveChangesAsync();
+            await _uow.Auditoria.LogAsync(
+                typeof(Pessoa).Name,
+                "INSERIU",
+                pessoaInseridaDto);
+            await _uow.CommitAsync(cancellationToken);
+            return pessoaInseridaDto;
         }
 
-        public async Task ExcluirPessoaAsync(Guid id)
+        public async Task ExcluirPessoaAsync(Guid id, CancellationToken cancellationToken)
         {
-            var pessoa = await _repo.GetByIdAsync(_empresaId, id)
+            var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Pessoa não encontrada");
+            var pessoaExcluidaDto = ToPessoaDto(pessoa);
 
-            await _repo.LoadContasPagarAsync(pessoa);
+            await _uow.Pessoas.LoadContasPagarAsync(pessoa);
             if (pessoa.ContasPagar!.Count > 0)
                 throw new Exception("Pessoa tem contas a pagar vinculadas");
-            await _repo.LoadContasReceberAsync(pessoa);
+
+            await _uow.Pessoas.LoadContasReceberAsync(pessoa);
             if (pessoa.ContasReceber!.Count > 0)
                 throw new Exception("Pessoa tem contas a receber vinculadas");
 
-            await _repo.DeleteAsync(pessoa);
+            await _uow.BeginTransactionAsync();
+
+            await _uow.Pessoas.DeleteAsync(pessoa);
+            await _uow.Auditoria.LogAsync<Pessoa>(
+                typeof(Pessoa).Name,
+                "EXCLUIU",
+                null,
+                pessoaExcluidaDto);
+
+            await _uow.CommitAsync(cancellationToken);
         }
 
         public async Task<List<PessoaDto>> ListarPessoasAsync()
         {
-            var pessoas = await _repo.GetAllAsync(_empresaId);
+            var pessoas = await _uow.Pessoas.GetAllAsync(_empresaId);
             return ToPessoasDto(pessoas);
         }
 
         public async Task<PessoaDto?> ObterPorIdAsync(Guid id)
         {
-            var pessoa = await _repo.GetByIdAsync(_empresaId, id);
+            var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, id);
             return ToPessoaDto(pessoa);
         }
 
-        public async Task AtualizarPessoaAsync(Guid id, PessoaDto dto)
+        public async Task AtualizarPessoaAsync(Guid id, PessoaDto dto, CancellationToken cancellationToken)
         {
-            var pessoa = await _repo.GetByIdAsync(_empresaId, id)
-                ?? throw new Exception("Pessoa não encontrado");
+            var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, id)
+                ?? throw new Exception("Pessoa não encontrada");
+            var dadosAntes = ToPessoaDto(pessoa);
 
             // TODO: fazer esta validação no Domain
-            if (dto.Nome == null)
-                throw new Exception("Nome do pessoa não pode ser nulo");
+            // if (dto.Nome == null)
+            //     throw new Exception("Nome do pessoa não pode ser nulo");
+
+            dto.Id = id;
+
+            await _uow.BeginTransactionAsync();
 
             pessoa.Atualizar(dto.Nome, dto.Codigo, dto.Cpf, dto.Cnpj);
+            await _uow.Pessoas.SaveChangesAsync();
+            await _uow.Auditoria.LogAsync(
+                typeof(Pessoa).Name,
+                "ALTEROU",
+                dto,
+                dadosAntes);
 
-            await _repo.SaveChangesAsync();
+            await _uow.CommitAsync(cancellationToken);
         }
 
         public async Task<(List<PessoaDto> Pessoas, int Total)> ListarPessoasPagAsync(
@@ -73,7 +100,7 @@ namespace kendo_londrina.Application.Services
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
-            var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
+            var query = _uow.Pessoas.Query(_empresaId);
 
             if (!string.IsNullOrWhiteSpace(nome))
                 query = query.Where(a => a.Nome.Contains(nome));
