@@ -10,42 +10,44 @@ namespace kendo_londrina.Application.Services
         private readonly ICurrentUserService _currentUser = currentUser;
 
         public async Task LogAsync<T>(
-            T entidade,
+            string entidadeNome,
             string acao,
+            T? entidade,
             object? dadosAntes = null)
         {
-            if (entidade == null) throw new ArgumentNullException(nameof(entidade));
+            Guid? entidadeId = null;
+            if (entidade != null)
+            {
+                // Tenta pegar uma propriedade "Id" da entidade
+                var entidadeIdProp = typeof(T).GetProperty("Id");
+                entidadeId = entidadeIdProp != null ? (Guid)entidadeIdProp.GetValue(entidade)! : Guid.NewGuid();
+            }
 
-            var entidadeType = typeof(T).Name;
-
-            // Tenta pegar uma propriedade "Id" da entidade
-            var entidadeIdProp = typeof(T).GetProperty("Id");
-            var entidadeId = entidadeIdProp != null ? (Guid)entidadeIdProp.GetValue(entidade)! : Guid.NewGuid();
+            var log = new AuditoriaEntry
+            {
+                Entidade = entidadeNome, // entidadeType,
+                EntidadeId = entidadeId,
+                Acao = acao,
+                DadosAntes = dadosAntes == null
+                    ? null
+                    : JsonConvert.SerializeObject(dadosAntes),
+                DadosDepois = entidade == null
+                    ? null
+                    : JsonConvert.SerializeObject(entidade),
+                Data = DateTime.UtcNow,
+                UsuarioId = Guid.Parse(_currentUser.UserId),
+                EmpresaId = Guid.Parse(_currentUser.EmpresaId!)
+            };
 
             try
             {
-                var jsonString = JsonConvert.SerializeObject(entidade);
+                await _repoAuditoria.AdicionarAsync(log);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
 
-            var log = new AuditoriaEntry
-            {
-                Entidade = entidadeType,
-                EntidadeId = entidadeId,
-                Acao = acao,
-                DadosAntes = dadosAntes == null
-                    ? null
-                    : JsonConvert.SerializeObject(dadosAntes),
-                DadosDepois = JsonConvert.SerializeObject(entidade),
-                Data = DateTime.UtcNow,
-                UsuarioId = Guid.Parse(_currentUser.UserId),
-                EmpresaId = Guid.Parse(_currentUser.EmpresaId!)
-            };
-
-            await _repoAuditoria.AdicionarAsync(log);
         }
     }
 }
