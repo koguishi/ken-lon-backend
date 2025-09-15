@@ -47,7 +47,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
     {
         try
         {
-            var conta = await _service.CriarContaReceberAsync(dto);
+            var conta = await _service.CriarContaReceberAsync(dto, HttpContext.RequestAborted);
             dto.Id = conta.Id;
         }
         catch (Exception ex)
@@ -65,7 +65,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
     {
         try
         {
-            await _service.AlterarContaReceberAsync(id, dto);
+            await _service.AlterarContaReceberAsync(id, dto, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
@@ -82,7 +82,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
     {
         try
         {
-            await _service.ExcluirContaReceberAsync(id);
+            await _service.ExcluirContaReceberAsync(id, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
@@ -99,7 +99,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
     {
         try
         {
-            await _service.RegistrarRecebimentoAsync(id, dto);
+            await _service.RegistrarRecebimentoAsync(id, dto, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
@@ -116,7 +116,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
     {
         try
         {
-            await _service.EstornarRecebimentoAsync(id, dto);
+            await _service.EstornarRecebimentoAsync(id, dto, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
