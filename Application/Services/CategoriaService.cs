@@ -1,8 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using kendo_londrina.Domain.Entities;
-using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Application.DTOs;
+using kendo_londrina.Domain.Entities;
 using kendo_londrina.Infra.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace kendo_londrina.Application.Services
 {
@@ -12,61 +11,85 @@ namespace kendo_londrina.Application.Services
         // o contexto é usado na alteração da Categoria com a inclusão de uma nova SubCategoria
         //  _context.Entry(subCategoria).State = EntityState.Added;
         private readonly KendoLondrinaContext _context;
-        private readonly ICategoriaRepository _repo;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ICurrentUserService _currentUser;
+        private readonly IUnitOfWork _uow;
         private readonly Guid _empresaId;
 
         public CategoriaService(KendoLondrinaContext context
-            , ICategoriaRepository repo
             , IUnitOfWork unitOfWork
             , ICurrentUserService currentUser)
         {
             _context = context;
-            _repo = repo;
-            _unitOfWork = unitOfWork;
-            _currentUser = currentUser;
-            _empresaId = Guid.Parse(_currentUser.EmpresaId!);
+            _uow = unitOfWork;
+            _empresaId = Guid.Parse(currentUser.EmpresaId!);
         }
 
-        public async Task<CategoriaDto> CriarCategoriaAsync(CategoriaDto categoriaDto)
+        public async Task<CategoriaDto> CriarCategoriaAsync(CategoriaDto dto, CancellationToken cancellationToken)
         {
-            var categoria = new Categoria(_empresaId, categoriaDto.Nome);
-            categoriaDto.SubCategorias.ForEach(s =>
+            var categoria = new Categoria(_empresaId, dto.Nome);
+            dto.SubCategorias.ForEach(s =>
                 categoria.AdicionarSubcategoria(s.Nome));
-            await _repo.AddAsync(categoria);
-            await _repo.SaveChangesAsync();
-            return ToCategoriaDto(categoria);
+            var categoriaInseridaDto = ToCategoriaDto(categoria);
+
+            await _uow.BeginTransactionAsync();
+
+            await _uow.Categorias.AddAsync(categoria);
+            await _uow.Categorias.SaveChangesAsync();
+            await _uow.Auditoria.LogAsync(
+                typeof(Categoria).Name,
+                "INSERIU",
+                categoriaInseridaDto);
+
+            await _uow.CommitAsync(cancellationToken);
+            return categoriaInseridaDto;
         }
 
-        public async Task ExcluirCategoriaAsync(Guid id)
+        public async Task ExcluirCategoriaAsync(Guid id, CancellationToken cancellationToken)
         {
-            var categoria = await _repo.GetByIdAsync(_empresaId, id)
+            var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Categoria não encontrada");
-            await _repo.DeleteAsync(categoria);
+            var categoriaExcluidaDto = ToCategoriaDto(categoria);
+
+            await _uow.Categorias.LoadContasPagarAsync(categoria);
+            if (categoria.ContasPagar!.Count > 0)
+                throw new Exception("Categoria tem contas a pagar vinculadas");
+
+            await _uow.Categorias.LoadContasReceberAsync(categoria);
+            if (categoria.ContasReceber!.Count > 0)
+                throw new Exception("Categoria tem contas a receber vinculadas");
+
+            await _uow.BeginTransactionAsync();
+
+            await _uow.Categorias.DeleteAsync(categoria);
+            await _uow.Auditoria.LogAsync<Categoria>(
+                typeof(Categoria).Name,
+                "EXCLUIU",
+                null,
+                categoriaExcluidaDto);
+
+            await _uow.CommitAsync(cancellationToken);
         }
 
         public async Task<List<CategoriaDto>> ListarCategoriasAsync()
         {
-            var categorias = await _repo.GetAllAsync(_empresaId);
+            var categorias = await _uow.Categorias.GetAllAsync(_empresaId);
             return ToCategoriasDto(categorias);
         }
 
         public async Task<CategoriaDto?> ObterPorIdAsync(Guid id)
         {
-            var categoria = await _repo.GetByIdAsync(_empresaId, id)
+            var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, id)
                 ?? null;
             return ToCategoriaDto(categoria!);
         }
 
-        public async Task AtualizarCategoriaAsync(Guid id, CategoriaDto dto)
+        public async Task AtualizarCategoriaAsync(Guid id, CategoriaDto dto, CancellationToken cancellationToken)
         {
-            var categoria = await _repo.GetByIdAsync(_empresaId, id)
+            var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Categoria não encontrada");
+            var dadosAntes = ToCategoriaDto(categoria);
+            dto.Id = id;
 
-            // TODO: transferir a validação para o domínio
-            // if (dto.Nome == null)
-            //     throw new Exception("Nome da categoria não pode ser nulo");
+            await _uow.BeginTransactionAsync();
 
             // Atualiza os dados da categoria
             categoria.Atualizar(dto.Nome, dto.Codigo);
@@ -103,7 +126,14 @@ namespace kendo_londrina.Application.Services
                     categoria.AlterarSubcategoria(existente.Id, nova.Nome);
                 }
             }
-            await _unitOfWork.CommitAsync();
+
+            await _uow.Auditoria.LogAsync(
+                typeof(Categoria).Name,
+                "ALTEROU",
+                dto,
+                dadosAntes);
+
+            await _uow.CommitAsync(cancellationToken);
         }
 
         public async Task<(List<CategoriaDto> Categorias, int Total)> ListarCategoriasPagAsync(
@@ -112,7 +142,7 @@ namespace kendo_londrina.Application.Services
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
-            var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
+            var query = _uow.Categorias.Query(_empresaId); // vamos criar Query() no repositório
 
             if (!string.IsNullOrWhiteSpace(nome))
                 query = query.Where(a => a.Nome.Contains(nome));

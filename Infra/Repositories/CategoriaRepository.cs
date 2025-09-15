@@ -52,5 +52,19 @@ namespace kendo_londrina.Infrastructure.Repositories
                 .Include(c => c.SubCategorias) // Inclui as SubCategorias na consulta
                 .Where(p => p.EmpresaId == empresaId).AsQueryable();
         }
+        public async Task LoadContasPagarAsync(Categoria categoria)
+        {
+            await _context.Entry(categoria)
+                .Collection(t => t.ContasPagar!)
+                .LoadAsync();
+        }
+
+        public async Task LoadContasReceberAsync(Categoria categoria)
+        {
+            await _context.Entry(categoria)
+                .Collection(t => t.ContasReceber!)
+                .LoadAsync();
+        }
+
     }
 }

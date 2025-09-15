@@ -11,5 +11,7 @@ namespace kendo_londrina.Domain.Repositories
         Task<List<Categoria>> GetAllAsync(Guid empresaId);
         // DDD paginado
         IQueryable<Categoria> Query(Guid empresaId);        
+        Task LoadContasPagarAsync(Categoria categoria);
+        Task LoadContasReceberAsync(Categoria categoria);
     }
 }
