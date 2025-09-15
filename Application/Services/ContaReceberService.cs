@@ -63,8 +63,11 @@ namespace kendo_londrina.Application.Services
             );
             await _repo.AddAsync(contaReceber);
 
-            var contaInseridaDto = ConvertToDto(contaReceber);
-            await _auditoriaService.LogAsync(contaInseridaDto, "inseriu");
+            var contaInseridaDto = ToDto(contaReceber);
+            await _auditoriaService.LogAsync(
+                typeof(ContaReceber).Name,
+                "iNSERIU",
+                contaInseridaDto);
 
             await _repo.SaveChangesAsync();
             return contaInseridaDto;
@@ -74,13 +77,19 @@ namespace kendo_londrina.Application.Services
         {
             var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
+            var contaReceberDto = ToDto(contaReceber);
             await _repo.DeleteAsync(contaReceber);
+            await _auditoriaService.LogAsync<ContaReceberDto>(
+                typeof(ContaReceber).Name,
+                "eXCLUIU",
+                null,
+                contaReceberDto);
         }
 
         public async Task<List<ContaReceberDto>> ListarContasReceberAsync()
         {
             var contas = await _repo.GetAllAsync(_empresaId);
-            return ConvertToListDto(contas);
+            return ToListDto(contas);
         }
 
         public async Task<ContaReceberDto?> ObterPorIdAsync(Guid id)
@@ -88,7 +97,7 @@ namespace kendo_londrina.Application.Services
             var conta = await _repo.GetByIdAsync(_empresaId, id);
             return (conta == null)
                 ? null
-                : ConvertToDto(conta);
+                : ToDto(conta);
         }
 
         public async Task AlterarContaReceberAsync(Guid id, ContaReceberDto dto)
@@ -97,8 +106,17 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
+            var dadosAntes = ToDto(contaReceber);
+
             contaReceber.Alterar(dto.Valor, dto.Vencimento, dto.Descricao, dto.Observacao
                 , dto.PessoaId, dto.CategoriaId, dto.SubCategoriaId);
+
+            dto.Id = id;
+            await _auditoriaService.LogAsync(
+                typeof(ContaReceber).Name,
+                "aLTEROU",
+                dto,
+                dadosAntes);
             await _repo.SaveChangesAsync();
         }
 
@@ -120,20 +138,20 @@ namespace kendo_londrina.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (ConvertToListDto(contas), total);
+            return (ToListDto(contas), total);
         }
 
-        private static List<ContaReceberDto> ConvertToListDto(List<ContaReceber> contasReceber)
+        private static List<ContaReceberDto> ToListDto(List<ContaReceber> contasReceber)
         {
             var dtoList = new List<ContaReceberDto>();
             foreach (var conta in contasReceber)
             {
-                dtoList.Add(ConvertToDto(conta));
+                dtoList.Add(ToDto(conta));
             }
             return dtoList;
         }
 
-        private static ContaReceberDto ConvertToDto(ContaReceber contaReceber)
+        private static ContaReceberDto ToDto(ContaReceber contaReceber)
         {
             return new ContaReceberDto
             {
@@ -160,8 +178,16 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
+            var dadosAntes = ToDto(contaReceber);
+
             contaReceber.RegistrarRecebimento(dto.MeioRecebimento
                 , dto.DataRecebimento, dto.ObsRecebimento);
+
+            await _auditoriaService.LogAsync(
+                typeof(ContaReceber).Name,
+                "Registrou Recebimento",
+                dto,
+                dadosAntes);
             await _repo.SaveChangesAsync();
         }
 
@@ -170,7 +196,15 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _repo.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
+            var dadosAntes = ToDto(contaReceber);
+
             contaReceber.EstornarRecebimento(dto.Observacao);
+
+            await _auditoriaService.LogAsync(
+                typeof(ContaReceber).Name,
+                "Estornou Recebimento",
+                dto,
+                dadosAntes);
             await _repo.SaveChangesAsync();
         }
     }
