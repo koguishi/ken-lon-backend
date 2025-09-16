@@ -11,6 +11,7 @@ public interface IUnitOfWork
     IPessoaRepository Pessoas { get; }
     ICategoriaRepository Categorias { get; }
     IContaReceberRepository ContasReceber { get; }
+    IContaPagarRepository ContasPagar { get; }
     Task BeginTransactionAsync();
     Task CommitAsync(CancellationToken cancellationToken = default);
     Task RollbackAsync();
@@ -20,12 +21,14 @@ public class UnitOfWork(KendoLondrinaContext context
     , IPessoaRepository pessoas
     , ICategoriaRepository categorias
     , IContaReceberRepository contasReceber
+    , IContaPagarRepository contasPagar
 ) : IUnitOfWork
 {
     private readonly KendoLondrinaContext _context = context;
     private IDbContextTransaction? _currentTransaction;
     public AuditoriaService Auditoria { get; } = auditoria;
     public IContaReceberRepository ContasReceber { get; } = contasReceber;
+    public IContaPagarRepository ContasPagar { get; } = contasPagar;
     public IPessoaRepository Pessoas { get; } = pessoas;
     public ICategoriaRepository Categorias { get; } = categorias;
 

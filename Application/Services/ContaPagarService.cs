@@ -1,40 +1,41 @@
 using Microsoft.EntityFrameworkCore;
 using kendo_londrina.Domain.Entities;
-using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Application.DTOs;
+using kendo_londrina.Infra.Data;
 
 namespace kendo_londrina.Application.Services
 {
     public class ContaPagarService
     {
-        private readonly IContaPagarRepository _repo;
-        private readonly IPessoaRepository _repoPessoa;
-        private readonly ICategoriaRepository _repoCategoria;
-        private readonly ICurrentUserService _currentUser;
+        private readonly IUnitOfWork _uow;
+        // private readonly IContaPagarRepository _uow.ContasPagar;
+        // private readonly IPessoaRepository _uow.ContasPagarPessoa;
+        // private readonly ICategoriaRepository _uow.ContasPagarCategoria;
         private readonly Guid _empresaId;
 
-        public ContaPagarService(IContaPagarRepository repo
-            , IPessoaRepository repoPessoa
-            , ICategoriaRepository repoCategoria
+        public ContaPagarService(IUnitOfWork uow
+            // , IContaPagarRepository repo
+            // , IPessoaRepository repoPessoa
+            // , ICategoriaRepository repoCategoria
             , ICurrentUserService currentUser)
         {
-            _repo = repo;
-            _repoPessoa = repoPessoa;
-            _repoCategoria = repoCategoria;
-            _currentUser = currentUser;
-            _empresaId = Guid.Parse(_currentUser.EmpresaId!);
+            _uow = uow;
+            // _uow.ContasPagar = repo;
+            // _uow.ContasPagarPessoa = repoPessoa;
+            // _uow.ContasPagarCategoria = repoCategoria;
+            _empresaId = Guid.Parse(currentUser.EmpresaId!);
         }
 
         private async Task VerificarVinculos(ContaPagarDto dto)
         {
             if (dto.PessoaId.HasValue)
             {
-                var pessoa = await _repoPessoa.GetByIdAsync(_empresaId, dto.PessoaId.Value)
+                var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, dto.PessoaId.Value)
                     ?? throw new Exception("Pessoa não encontrada");
             }
             if (dto.CategoriaId.HasValue)
             {
-                var categoria = await _repoCategoria.GetByIdAsync(_empresaId, dto.CategoriaId.Value)
+                var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, dto.CategoriaId.Value)
                     ?? throw new Exception("Categoria não encontrada");
                 if (dto.SubCategoriaId.HasValue)
                 {
@@ -46,7 +47,7 @@ namespace kendo_londrina.Application.Services
             }
         }
 
-        public async Task<ContaPagarDto> CriarContaPagarAsync(ContaPagarDto dto)
+        public async Task<ContaPagarDto> CriarContaPagarAsync(ContaPagarDto dto, CancellationToken cancellationToken)
         {
             await VerificarVinculos(dto);
             var contaPagar = new ContaPagar(_empresaId
@@ -58,41 +59,74 @@ namespace kendo_londrina.Application.Services
                 , dto.CategoriaId
                 , dto.SubCategoriaId
             );
-            await _repo.AddAsync(contaPagar);
-            await _repo.SaveChangesAsync();
-            return ConvertToDto(contaPagar);
+            var contaInseridaDto = ToDto(contaPagar);
+
+            await _uow.BeginTransactionAsync();
+
+            await _uow.ContasPagar.AddAsync(contaPagar);
+            await _uow.ContasPagar.SaveChangesAsync();
+            await _uow.Auditoria.LogAsync(
+                typeof(ContaPagar).Name,
+                "INSERIU",
+                contaInseridaDto);
+
+            await _uow.CommitAsync(cancellationToken);
+
+            return contaInseridaDto;
         }
 
-        public async Task ExcluirContaPagarAsync(Guid id)
+        public async Task ExcluirContaPagarAsync(Guid id, CancellationToken cancellationToken)
         {
-            var contaPagar = await _repo.GetByIdAsync(_empresaId, id)
+            var contaPagar = await _uow.ContasPagar.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Pagar não encontrada");
-            await _repo.DeleteAsync(contaPagar);
+            var contaPagarDto = ToDto(contaPagar);
+
+            await _uow.BeginTransactionAsync();
+
+            await _uow.ContasPagar.DeleteAsync(contaPagar);
+            await _uow.Auditoria.LogAsync<ContaPagarDto>(
+                typeof(ContaPagar).Name,
+                "eXCLUIU",
+                null,
+                contaPagarDto);
+
+            await _uow.CommitAsync(cancellationToken);
         }
 
         public async Task<List<ContaPagarDto>> ListarContasPagarAsync()
         {
-            var contas = await _repo.GetAllAsync(_empresaId);
-            return ConvertToListDto(contas);
+            var contas = await _uow.ContasPagar.GetAllAsync(_empresaId);
+            return ToListDto(contas);
         }
 
         public async Task<ContaPagarDto?> ObterPorIdAsync(Guid id)
         {
-            var conta = await _repo.GetByIdAsync(_empresaId, id);
+            var conta = await _uow.ContasPagar.GetByIdAsync(_empresaId, id);
             return (conta == null)
                 ? null
-                : ConvertToDto(conta);
+                : ToDto(conta);
         }
 
-        public async Task AlterarContaPagarAsync(Guid id, ContaPagarDto dto)
+        public async Task AlterarContaPagarAsync(Guid id, ContaPagarDto dto, CancellationToken cancellationToken)
         {
             await VerificarVinculos(dto);
-            var contaPagar = await _repo.GetByIdAsync(_empresaId, id)
+            var contaPagar = await _uow.ContasPagar.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Pagar não encontrada");
+            var dadosAntes = ToDto(contaPagar);
+            dto.Id = id;
+
+            await _uow.BeginTransactionAsync();
 
             contaPagar.Alterar(dto.Valor, dto.Vencimento, dto.Descricao, dto.Observacao
                 , dto.PessoaId, dto.CategoriaId, dto.SubCategoriaId);
-            await _repo.SaveChangesAsync();
+            await _uow.ContasPagar.SaveChangesAsync();
+            await _uow.Auditoria.LogAsync(
+                typeof(ContaPagar).Name,
+                "ALTEROU",
+                dto,
+                dadosAntes);
+
+            await _uow.CommitAsync(cancellationToken);
         }
 
         public async Task<(List<ContaPagarDto> ContasPagar, int Total)> ListarContasPagarPaginadoAsync(
@@ -101,7 +135,7 @@ namespace kendo_londrina.Application.Services
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
-            var query = _repo.Query(_empresaId); // vamos criar Query() no repositório
+            var query = _uow.ContasPagar.Query(_empresaId); // vamos criar Query() no repositório
 
             if (pago.HasValue)
                 query = query.Where(a => a.Pago == pago);
@@ -113,20 +147,20 @@ namespace kendo_londrina.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (ConvertToListDto(contas), total);
+            return (ToListDto(contas), total);
         }
 
-        private static List<ContaPagarDto> ConvertToListDto(List<ContaPagar> contasPagar)
+        private static List<ContaPagarDto> ToListDto(List<ContaPagar> contasPagar)
         {
             var dtoList = new List<ContaPagarDto>();
             foreach (var conta in contasPagar)
             {
-                dtoList.Add(ConvertToDto(conta));
+                dtoList.Add(ToDto(conta));
             }
             return dtoList;
         }
 
-        private static ContaPagarDto ConvertToDto(ContaPagar contaPagar)
+        private static ContaPagarDto ToDto(ContaPagar contaPagar)
         {
             return new ContaPagarDto
             {
