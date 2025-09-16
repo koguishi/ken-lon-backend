@@ -52,7 +52,7 @@ public class ContasPagarController : ControllerBase
     {
         try
         {
-            var conta = await _service.CriarContaPagarAsync(dto);
+            var conta = await _service.CriarContaPagarAsync(dto, HttpContext.RequestAborted);
             dto.Id = conta.Id;
         }
         catch (Exception ex)
@@ -70,7 +70,7 @@ public class ContasPagarController : ControllerBase
     {
         try
         {
-            await _service.AlterarContaPagarAsync(id, dto);
+            await _service.AlterarContaPagarAsync(id, dto, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
@@ -87,13 +87,13 @@ public class ContasPagarController : ControllerBase
     {
         try
         {
-            await _service.ExcluirContaPagarAsync(id);
+            await _service.ExcluirContaPagarAsync(id, HttpContext.RequestAborted);
         }
         catch (Exception ex)
         {
             if (ex.Message.Contains("não encontrad"))
                 return NotFound();
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(ex.Message);
         }
         return NoContent();
     }
