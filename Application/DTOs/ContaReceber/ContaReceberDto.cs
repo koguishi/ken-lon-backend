@@ -21,4 +21,9 @@ public class ContaReceberDto
     public Guid? PessoaId { get; set; }
     public Guid? CategoriaId { get; set; }
     public Guid? SubCategoriaId { get; set; }
+
+    public string? PessoaNome { get; set; }
+    public string? CategoriaNome { get; set; }
+    public string? SubCategoriaNome { get; set; }
+
 }
