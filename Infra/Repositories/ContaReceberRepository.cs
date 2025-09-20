@@ -22,6 +22,9 @@ namespace kendo_londrina.Infrastructure.Repositories
         public async Task<ContaReceber?> GetByIdAsync(Guid empresaId, Guid id)
         {
             var contaReceber = await _context.ContasReceber
+                .Include(c => c.Pessoa)
+                .Include(c => c.Categoria)
+                .Include(c => c.SubCategoria)
                 .Where(p => p.EmpresaId == empresaId && p.Id == id)
                 .FirstOrDefaultAsync();
             return contaReceber;

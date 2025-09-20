@@ -167,6 +167,12 @@ namespace kendo_londrina.Application.Services
                 PessoaId = contaReceber.PessoaId,
                 CategoriaId = contaReceber.CategoriaId,
                 SubCategoriaId = contaReceber.SubCategoriaId,
+                PessoaNome = contaReceber.Pessoa != null
+                    ? contaReceber.Pessoa!.Nome : null,
+                CategoriaNome = contaReceber.Categoria != null
+                    ? contaReceber.Categoria!.Nome : null,
+                SubCategoriaNome = contaReceber.SubCategoria != null
+                    ? contaReceber.SubCategoria!.Nome : null,
             };
         }
 
