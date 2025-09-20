@@ -10,6 +10,7 @@ namespace kendo_londrina.Domain.Repositories
         Task SaveChangesAsync();
         Task<List<ContaReceber>> GetAllAsync(Guid empresaId);
         // DDD paginado
-        IQueryable<ContaReceber> Query(Guid empresaId);        
+        IQueryable<ContaReceber> Query(Guid empresaId);
+        Task<ContaReceber?> GetBySubCategoriaAsync(Guid empresaId, Guid subCategoriaId);
     }
 }
