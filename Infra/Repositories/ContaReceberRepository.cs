@@ -52,5 +52,14 @@ namespace kendo_londrina.Infrastructure.Repositories
             return _context.ContasReceber
                 .Where(p => p.EmpresaId == empresaId).AsQueryable();
         }
+
+        public async Task<ContaReceber?> GetBySubCategoriaAsync(Guid empresaId, Guid subCategoriaId)
+        {
+            var contaReceber = await _context.ContasReceber
+                .Where(p => p.EmpresaId == empresaId && p.SubCategoriaId == subCategoriaId)
+                .FirstOrDefaultAsync();
+            return contaReceber;
+        }
+
     }
 }
