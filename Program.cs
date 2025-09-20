@@ -49,15 +49,16 @@ builder.Services.AddAuthorization(
     }
 );
 
-var frontendUrl = builder.Configuration["FRONTEND_URL"] ?? string.Empty;
-
+// var frontendUrl = builder.Configuration["FRONTEND_URL"] ?? string.Empty;
+var frontendUrls = builder.Configuration["FRONTEND_URLS"]?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
 // 1. Adicionar política de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins(frontendUrl)
+            policy.WithOrigins(frontendUrls)
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
