@@ -103,14 +103,17 @@ namespace kendo_londrina.Application.Services
             // Remover as que não estão mais presentes
             foreach (var existente in existentes)
             {
-                var contaReceber = await _uow.ContasReceber.GetBySubCategoriaAsync(_empresaId, existente.Id)
-                    ?? throw new Exception($"Categoria {existente.Nome} tem contas a receber vinculadas");
-
-                var contaPagar = await _uow.ContasPagar.GetBySubCategoriaAsync(_empresaId, existente.Id)
-                    ?? throw new Exception($"Categoria {existente.Nome} tem contas a pagar vinculadas");
-
                 if (!novas.Any(s => s.Id == existente.Id))
+                {
+                    var contaReceber = await _uow.ContasReceber.GetBySubCategoriaAsync(_empresaId, existente.Id);
+                    if (contaReceber != null)
+                        throw new Exception($"Categoria {existente.Nome} tem contas a receber vinculadas");
+                    var contaPagar = await _uow.ContasPagar.GetBySubCategoriaAsync(_empresaId, existente.Id);
+                    if (contaPagar != null)
+                        throw new Exception($"Categoria {existente.Nome} tem contas a pagar vinculadas");
+
                     categoria.ExcluirSubcategoria(existente.Id);
+                }
             }
 
             // inserir e atualizar as que vieram no DTO
