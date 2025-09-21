@@ -6,6 +6,7 @@ namespace kendo_londrina.Domain.Repositories
     {
         Task<ContaReceber?> GetByIdAsync(Guid empresaId, Guid id);
         Task AddAsync(ContaReceber contaReceber);
+        Task AddRangeAsync(ContaReceber[] contas);
         Task DeleteAsync(ContaReceber contaReceber);
         Task SaveChangesAsync();
         Task<List<ContaReceber>> GetAllAsync(Guid empresaId);
