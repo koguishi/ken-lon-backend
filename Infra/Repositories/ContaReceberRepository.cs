@@ -35,6 +35,11 @@ namespace kendo_londrina.Infrastructure.Repositories
             await _context.ContasReceber.AddAsync(contaReceber);
         }
 
+        public async Task AddRangeAsync(ContaReceber[] contas)
+        {
+            await _context.ContasReceber.AddRangeAsync(contas);
+        }
+
         public Task DeleteAsync(ContaReceber contaReceber)
         {
             _context.ContasReceber.Remove(contaReceber);
