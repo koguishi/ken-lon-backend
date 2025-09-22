@@ -1,4 +1,5 @@
 using kendo_londrina.Application.DTOs;
+using kendo_londrina.Application.DTOs.ContaReceber;
 using kendo_londrina.Domain.Entities;
 using kendo_londrina.Infra.Data;
 using Microsoft.EntityFrameworkCore;
@@ -17,58 +18,113 @@ namespace kendo_londrina.Application.Services
             _empresaId = Guid.Parse(currentUser.EmpresaId!);
         }
 
-        private async Task VerificarVinculos(ContaReceberDto dto)
+        // substituido por ExisteCategoriaSubCategoria e ExistePessoa em 22/09/2025
+        // private async Task VerificarVinculos(ContaReceberDto dto)
+        // {
+        //     if (dto.PessoaId.HasValue)
+        //     {
+        //         var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, dto.PessoaId.Value)
+        //             ?? throw new Exception("Pessoa não encontrada");
+        //     }
+        //     if (dto.CategoriaId.HasValue)
+        //     {
+        //         var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, dto.CategoriaId.Value)
+        //             ?? throw new Exception("Categoria não encontrada");
+        //         if (dto.SubCategoriaId.HasValue)
+        //         {
+        //             bool existe = categoria.SubCategorias!
+        //                 .Any(s => s.Id == dto.SubCategoriaId.Value);
+        //             if (!existe)
+        //                 throw new Exception("Subcategoria não pertence a esta categoria");
+        //         }
+        //     }
+        // }
+
+        private async Task ExistePessoa(Guid? pessoaId)
         {
-            if (dto.PessoaId.HasValue)
+            if (pessoaId.HasValue)
             {
-                var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, dto.PessoaId.Value)
+                var pessoa = await _uow.Pessoas.GetByIdAsync(_empresaId, pessoaId.Value)
                     ?? throw new Exception("Pessoa não encontrada");
             }
-            if (dto.CategoriaId.HasValue)
+        }
+
+        private async Task ExisteCategoriaSubCategoria(Guid? categoriaId, Guid? subCategoriaId)
+        {
+            if (categoriaId.HasValue)
             {
-                var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, dto.CategoriaId.Value)
+                var categoria = await _uow.Categorias.GetByIdAsync(_empresaId, categoriaId.Value)
                     ?? throw new Exception("Categoria não encontrada");
-                if (dto.SubCategoriaId.HasValue)
+                if (subCategoriaId.HasValue)
                 {
                     bool existe = categoria.SubCategorias!
-                        .Any(s => s.Id == dto.SubCategoriaId.Value);
+                        .Any(s => s.Id == subCategoriaId.Value);
                     if (!existe)
                         throw new Exception("Subcategoria não pertence a esta categoria");
                 }
             }
         }
-
-        public async Task<ContaReceberDto> CriarContaReceberAsync(
-            ContaReceberDto dto, CancellationToken cancellationToken)
+        
+        public async Task<List<ContaReceberInsercaoDto>> CriarContasReceberAsync(
+            ContaReceberInsercaoDto dto, CancellationToken cancellationToken)
         {
-            await VerificarVinculos(dto);
-            var contaReceber = new ContaReceber(_empresaId
-                , dto.Valor
-                , dto.Vencimento
-                , dto.Descricao
-                , dto.Observacao
-                , dto.PessoaId
-                , dto.CategoriaId
-                , dto.SubCategoriaId
-            );
-            var contaInseridaDto = ToDto(contaReceber);
+            await ExistePessoa(dto.PessoaId);
+            await ExisteCategoriaSubCategoria(dto.CategoriaId, dto.SubCategoriaId);
+
+            var contas = dto.Vencimentos!.Select(vencimento => new ContaReceber(
+                _empresaId,
+                dto.Valor,
+                vencimento,
+                dto.Descricao,
+                dto.Observacao,
+                dto.PessoaId,
+                dto.CategoriaId,
+                dto.SubCategoriaId
+            )).ToList();
+            var contasInseridasDto = ToContaReceberInsercaoDtoList([.. contas]);
 
             await _uow.BeginTransactionAsync();
-            await _uow.ContasReceber.AddAsync(contaReceber);
+            await _uow.ContasReceber.AddRangeAsync([..contas]);
             await _uow.Auditoria.LogAsync(
                 typeof(ContaReceber).Name,
                 "iNSERIU",
-                contaInseridaDto);
+                contasInseridasDto);
             await _uow.CommitAsync(cancellationToken);
-            return contaInseridaDto;
+            return contasInseridasDto;
         }
+
+        // substituído por CriarContasReceberAsync em 22/09/2025
+        // public async Task<ContaReceberDto> CriarContaReceberAsync(
+        //     ContaReceberDto dto, CancellationToken cancellationToken)
+        // {
+        //     await VerificarVinculos(dto);
+        //     var contaReceber = new ContaReceber(_empresaId
+        //         , dto.Valor
+        //         , dto.Vencimento
+        //         , dto.Descricao
+        //         , dto.Observacao
+        //         , dto.PessoaId
+        //         , dto.CategoriaId
+        //         , dto.SubCategoriaId
+        //     );
+        //     var contaInseridaDto = ToDto(contaReceber);
+
+        //     await _uow.BeginTransactionAsync();
+        //     await _uow.ContasReceber.AddAsync(contaReceber);
+        //     await _uow.Auditoria.LogAsync(
+        //         typeof(ContaReceber).Name,
+        //         "iNSERIU",
+        //         contaInseridaDto);
+        //     await _uow.CommitAsync(cancellationToken);
+        //     return contaInseridaDto;
+        // }
 
         public async Task ExcluirContaReceberAsync(Guid id,
             CancellationToken cancellationToken)
         {
             var contaReceber = await _uow.ContasReceber.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
-            var contaReceberDto = ToDto(contaReceber);
+            var contaReceberDto = ToContaReceberDto(contaReceber);
 
             await _uow.BeginTransactionAsync();
             await _uow.ContasReceber.DeleteAsync(contaReceber);
@@ -83,7 +139,7 @@ namespace kendo_londrina.Application.Services
         public async Task<List<ContaReceberDto>> ListarContasReceberAsync()
         {
             var contas = await _uow.ContasReceber.GetAllAsync(_empresaId);
-            return ToListDto(contas);
+            return ToContaReceberDtoList(contas);
         }
 
         public async Task<ContaReceberDto?> ObterPorIdAsync(Guid id)
@@ -91,17 +147,19 @@ namespace kendo_londrina.Application.Services
             var conta = await _uow.ContasReceber.GetByIdAsync(_empresaId, id);
             return (conta == null)
                 ? null
-                : ToDto(conta);
+                : ToContaReceberDto(conta);
         }
 
         public async Task AlterarContaReceberAsync(Guid id,
-            ContaReceberDto dto, CancellationToken cancellationToken)
+            ContaReceberAlteracaoDto dto, CancellationToken cancellationToken)
         {
-            await VerificarVinculos(dto);
+            await ExistePessoa(dto.PessoaId);
+            await ExisteCategoriaSubCategoria(dto.CategoriaId, dto.SubCategoriaId);
+
             var contaReceber = await _uow.ContasReceber.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
-            var dadosAntes = ToDto(contaReceber);
+            var dadosAntes = ToContaReceberDto(contaReceber);
 
             contaReceber.Alterar(dto.Valor, dto.Vencimento, dto.Descricao, dto.Observacao
                 , dto.PessoaId, dto.CategoriaId, dto.SubCategoriaId);
@@ -135,20 +193,45 @@ namespace kendo_londrina.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (ToListDto(contas), total);
+            return (ToContaReceberDtoList(contas), total);
         }
 
-        private static List<ContaReceberDto> ToListDto(List<ContaReceber> contasReceber)
+        private static List<ContaReceberInsercaoDto> ToContaReceberInsercaoDtoList(List<ContaReceber> contasReceber)
         {
-            var dtoList = new List<ContaReceberDto>();
+            var dtoList = new List<ContaReceberInsercaoDto>();
             foreach (var conta in contasReceber)
             {
-                dtoList.Add(ToDto(conta));
+                dtoList.Add(ToContaReceberInsercaoDto(conta));
             }
             return dtoList;
         }
 
-        private static ContaReceberDto ToDto(ContaReceber contaReceber)
+        private static ContaReceberInsercaoDto ToContaReceberInsercaoDto(ContaReceber contaReceber)
+        {
+            return new ContaReceberInsercaoDto
+            {
+                Id = contaReceber.Id,
+                Valor = contaReceber.Valor,
+                Vencimentos = [contaReceber.Vencimento],
+                Descricao = contaReceber.Descricao,
+                Observacao = contaReceber.Observacao,
+                PessoaId = contaReceber.PessoaId,
+                CategoriaId = contaReceber.CategoriaId,
+                SubCategoriaId = contaReceber.SubCategoriaId,
+            };
+        }
+
+        private static List<ContaReceberDto> ToContaReceberDtoList(List<ContaReceber> contasReceber)
+        {
+            var dtoList = new List<ContaReceberDto>();
+            foreach (var conta in contasReceber)
+            {
+                dtoList.Add(ToContaReceberDto(conta));
+            }
+            return dtoList;
+        }
+
+        private static ContaReceberDto ToContaReceberDto(ContaReceber contaReceber)
         {
             return new ContaReceberDto
             {
@@ -182,7 +265,7 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _uow.ContasReceber.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
-            var dadosAntes = ToDto(contaReceber);
+            var dadosAntes = ToContaReceberDto(contaReceber);
 
             contaReceber.RegistrarRecebimento(dto.MeioRecebimento
                 , dto.DataRecebimento, dto.ObsRecebimento);
@@ -203,7 +286,7 @@ namespace kendo_londrina.Application.Services
             var contaReceber = await _uow.ContasReceber.GetByIdAsync(_empresaId, id)
                 ?? throw new Exception("Conta a Receber não encontrada");
 
-            var dadosAntes = ToDto(contaReceber);
+            var dadosAntes = ToContaReceberDto(contaReceber);
 
             contaReceber.EstornarRecebimento(dto.Observacao);
 

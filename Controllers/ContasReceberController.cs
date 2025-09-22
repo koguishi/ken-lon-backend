@@ -1,4 +1,5 @@
 using kendo_londrina.Application.DTOs;
+using kendo_londrina.Application.DTOs.ContaReceber;
 using kendo_londrina.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,12 +44,15 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
 
     // POST: api/contasreceber
     [HttpPost]
-    public async Task<ActionResult<ContaReceberDto>> Create([FromBody] ContaReceberDto dto)
+    public async Task<ActionResult> Create([FromBody] ContaReceberInsercaoDto dto)
     {
         try
         {
-            var conta = await _service.CriarContaReceberAsync(dto, HttpContext.RequestAborted);
-            dto.Id = conta.Id;
+            var contas = await _service.CriarContasReceberAsync(dto, HttpContext.RequestAborted);
+            dto.Id = contas[0].Id;
+            return contas.Count == 1
+                ? CreatedAtAction(nameof(GetById), new { id = contas[0].Id }, dto)
+                : Created("", contas);
         }
         catch (Exception ex)
         {
@@ -56,12 +60,11 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
                 return NotFound(ex.Message);
             return BadRequest(ex.Message);
         }
-        return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     // PUT: api/contasreceber/5
     [HttpPut("{id:Guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ContaReceberDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] ContaReceberAlteracaoDto dto)
     {
         try
         {
