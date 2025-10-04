@@ -176,7 +176,7 @@ namespace kendo_londrina.Application.Services
         }
 
         public async Task<(List<ContaReceberDto> ContasReceber, int Total)> ListarContasReceberPaginadoAsync(
-            bool? recebido, int page = 1, int pageSize = 10)
+            int page = 1, int pageSize = 10, bool? recebido = null, Guid? pessoaId = null)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
@@ -186,11 +186,36 @@ namespace kendo_londrina.Application.Services
             if (recebido.HasValue)
                 query = query.Where(a => a.Recebido == recebido);
 
+            if (pessoaId.HasValue)
+                query = query.Where(a => a.PessoaId == pessoaId);
+
             var total = await query.CountAsync();
             var contas = await query
                 .OrderBy(a => a.Vencimento)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync();
+
+            return (ToContaReceberDtoList(contas), total);
+        }
+
+        public async Task<(List<ContaReceberDto>, int Total)> ListarPorPessoaVencimentoAsync(
+            Guid pessoaId, DateTime? vencimentoInicial, DateTime? vencimentoFinal, bool? recebido = null)
+        {
+            var query = _uow.ContasReceber.Query(_empresaId);
+
+            query = query.Where(a => a.PessoaId == pessoaId);
+
+            if (vencimentoInicial.HasValue)
+                query = query.Where(a => a.Vencimento >= vencimentoInicial);
+            if (vencimentoFinal.HasValue)
+                query = query.Where(a => a.Vencimento <= vencimentoFinal);
+            if (recebido.HasValue)
+                query = query.Where(a => a.Recebido == recebido);
+
+            var total = await query.CountAsync();
+            var contas = await query
+                .OrderBy(a => a.Vencimento)
                 .ToListAsync();
 
             return (ToContaReceberDtoList(contas), total);
