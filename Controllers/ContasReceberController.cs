@@ -20,7 +20,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
         [FromQuery] int pageSize = 10)
     {
         var (contas, total) = await _service.ListarContasReceberPaginadoAsync(
-            recebido, page, pageSize);
+            page, pageSize, recebido);
 
         var totalPages = (int)Math.Ceiling(total / (double)pageSize);
         return Ok(new
@@ -96,7 +96,7 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
         return NoContent();
     }
 
-    // PATCH: api/contasreceber/5
+    // PATCH: api/contasreceber/registrar-recebimento/5
     [HttpPatch("registrar-recebimento/{id:Guid}")]
     public async Task<IActionResult> RegistrarRecebimento(Guid id, [FromBody] RegistrarRecebimentoDto dto)
     {
@@ -112,8 +112,8 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
         }
         return NoContent();
     }
-    
-    // PATCH: api/contasreceber/5
+
+    // PATCH: api/contasreceber/estornar-recebimento/5
     [HttpPatch("estornar-recebimento/{id:Guid}")]
     public async Task<IActionResult> EstornarRecebimento(Guid id, [FromBody] EstornarRecebimentoDto dto)
     {
@@ -128,6 +128,24 @@ public class ContasReceberController(ContaReceberService service) : ControllerBa
             return BadRequest(ex.Message);
         }
         return NoContent();
+    }
+    
+    // GET: api/contasreceber/
+    [HttpGet("by-pessoa/{pessoaId:Guid}")]
+    public async Task<IActionResult> GetByPessoaId(
+        Guid pessoaId, 
+        [FromQuery] DateTime? vencimentoInicial,
+        [FromQuery] DateTime? vencimentoFinal,
+        [FromQuery] bool? recebido = null)
+    {
+        var (contas, total) = await _service.ListarPorPessoaVencimentoAsync(
+            pessoaId, vencimentoInicial, vencimentoFinal, recebido);
+
+        return Ok(new
+        {
+            totalItems = total,
+            contas
+        });
     }
 
 }
