@@ -48,6 +48,8 @@ public class FichaFinanceiraService
         {
             JobId = Guid.NewGuid(),
             NomePessoa = pessoa.Nome,
+            VencimentoInicial = vencimentoInicial,
+            VencimentoFinal = vencimentoFinal,
             Titulos = [.. contas.Select(c => new TituloDto
             {
                 Vencimento = c.Vencimento,
