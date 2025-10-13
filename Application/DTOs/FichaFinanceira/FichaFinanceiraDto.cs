@@ -1,9 +1,11 @@
-namespace kendo_londrina.Application.DTOs;
+namespace kendo_londrina.Application.DTOs.FichaFinanceira;
 
 public class FichaFinanceiraDto
 {
     public Guid? JobId { get; set; }
-    public int Ano { get; set; }
+    public int? Ano { get; set; }
+    public DateTime VencimentoInicial { get; set; }
+    public DateTime VencimentoFinal { get; set; }
     public required string NomePessoa { get; set; }
     public ResumoFinanceiroDto? Resumo { get; set; }
     public required List<TituloDto> Titulos { get; set; }
