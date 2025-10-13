@@ -3,6 +3,7 @@ using kendo_londrina.Application.Services;
 using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Infra.Auditoria;
 using kendo_londrina.Infra.Data;
+using kendo_londrina.Infra.MessageQueue;
 using kendo_londrina.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -71,6 +72,11 @@ builder.Services.AddDbContext<KendoLondrinaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Dependency Injection
+
+builder.Services.AddSingleton<IMessageQueue, AmazonSQSService>();
+
+builder.Services.AddScoped<FichaFinanceiraService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
