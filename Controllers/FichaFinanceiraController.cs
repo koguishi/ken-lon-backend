@@ -1,3 +1,4 @@
+using kendo_londrina.Application.DTOs.FichaFinanceira;
 using kendo_londrina.Application.Services;
 using kendo_londrina.Infra.MessageQueue;
 using Microsoft.AspNetCore.Authorization;
@@ -37,30 +38,34 @@ public class FichaFinanceiraController : ControllerBase
         });
     }
 
-    [HttpPost("{pessoaId:Guid}/ano/{ano:int}/gerar-pdf")]
-    public async Task<IActionResult> EnviarFilaGeracaoPdf(
-        Guid pessoaId,
-        int ano,
-        [FromQuery] bool? recebido = null)
+    [HttpPost("pdf-queue")]
+    public async Task<IActionResult> EnfileirarPDF(
+        [FromBody] FichaFinanceiraRequestDto request)
     {
-
-        var dto = await _service.GerarFichaFinanceiraDtoAsync(
-            pessoaId, ano, recebido);
-
-        // mandar para aws sqs
-        _messageQueue.SendAsync(JsonSerializer.Serialize(dto)).Wait();
-
-        // o projeto worker:
-        //  - processa fila (gerar PDF e subir para CloudFlare R2)
-        //  - retornar URL do PDF
-
-        return Ok(new
+        try
         {
-            message = "Pedido enfileirado com sucesso",
-            pessoa = dto.NomePessoa,
-            ano = dto.Ano,
-            jobId = dto.JobId,
-        });
+            var dto = await _service.GerarFichaFinanceiraDtoAsync(
+                request.PessoaId, request.VencimentoInicial, request.VencimentoFinal, request.Recebido);
+
+            // mandar para aws sqs
+            _messageQueue.SendAsync(JsonSerializer.Serialize(dto)).Wait();
+
+            // o projeto worker:
+            //  - processa fila (gerar PDF e subir para CloudFlare R2)
+            //  - retornar URL do PDF
+
+            return Ok(new
+            {
+                message = "Pedido de geração de PDF-Ficha Financeira enfileirado com sucesso",
+                jobId = dto.JobId,
+            });
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound(ex.Message);
+            return BadRequest(ex.Message);
+        }
     }
 
 }
