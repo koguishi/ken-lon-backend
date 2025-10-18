@@ -6,6 +6,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kendo-londrina", "kendo-lon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ken-lon-back-tests", "Tests\ken-lon-back-tests.csproj", "{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{A0F64134-9775-4BC8-9902-3BF3D2A51DA9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{1CA51D90-CF4C-4B78-99A5-D76C784C059E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pdf-gen-worker", "Infra\Workers\pdf-gen-worker\pdf-gen-worker.csproj", "{EEC66A0A-4009-48CB-BC2E-8A2575315393}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,11 +26,19 @@ Global
 		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3779F320-4F92-4E3C-AE43-1E182BE7230E}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1CA51D90-CF4C-4B78-99A5-D76C784C059E} = {A0F64134-9775-4BC8-9902-3BF3D2A51DA9}
+		{EEC66A0A-4009-48CB-BC2E-8A2575315393} = {1CA51D90-CF4C-4B78-99A5-D76C784C059E}
 	EndGlobalSection
 EndGlobal
