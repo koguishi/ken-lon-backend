@@ -71,4 +71,66 @@ jobs:
           app-name: 'ken-lon-stg'
           slot-name: 'Production'
           package: .
-          
+
+  deploy-worker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Faz checkout do código
+      # - name: Checkout código
+      #   uses: actions/checkout@v4
+
+      # Instala o .NET SDK (ajuste conforme sua versão)
+      # - name: Configurar .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: 8.x
+
+      # Restaura e publica o projeto do WebJob
+      - name: Publicar WebJob
+        run: |
+          dotnet publish ./Infra/Workers/pdf-gen-worker.csproj  -c Release -o ./publish/webjob
+
+      # Monta estrutura esperada pelo Azure WebJobs
+      - name: Estruturar diretório do WebJob
+        run: |
+          mkdir -p ./publish/zip/App_Data/Jobs/Continuous/PdfGenWorker
+          cp -r ./publish/webjob/* ./publish/zip/App_Data/Jobs/Continuous/PdfGenWorker/
+
+      # Criar run.cmd se não existir
+      - name: Garantir run.cmd
+        run: |
+          if [ ! -f ./publish/zip/App_Data/Jobs/Continuous/PdfGenWorker/run.cmd ]; then
+            echo "dotnet pdf-gen-worker.dll" > ./publish/zip/App_Data/Jobs/Continuous/PdfGenWorker/run.cmd
+          fi          
+
+      # Gera o ZIP final
+      - name: Compactar WebJob
+        run: |
+          cd publish/zip
+          zip -r pdf-gen-worker.zip .
+
+      - name: Listar conteúdo do ZIP
+        run: |
+          unzip -l ./publish/zip/pdf-gen-worker.zip
+
+      # - name: Azure Login
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get access token
+        id: get_token
+        run: |
+          TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken -o tsv)
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      # 6️⃣ Fazer upload via Kudu API (sem afetar a WebApp principal)
+      - name: Deploy do WebJob via Kudu
+        run: |
+          curl -X PUT \
+            -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}" \
+            -H "Content-Type: application/zip" \
+            -H "Content-Disposition: attachment; filename=pdf-gen-worker.zip" \
+            --data-binary @"./publish/zip/pdf-gen-worker.zip" \
+            "https://${{ secrets.AZURE_WEBAPP_NAME }}.scm.brazilsouth-01.azurewebsites.net/api/continuouswebjobs/pdf-gen-worker"
