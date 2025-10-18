@@ -25,7 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="Tests\ken-lon-back-tests.csproj" />
-  </ItemGroup>
+    <Compile Remove="Tests\**\*.cs" />
+    <Compile Remove="**\obj\**\*.cs" />
+    <Compile Remove="**\bin\**\*.cs" />
+  </ItemGroup>  
 
 </Project>
