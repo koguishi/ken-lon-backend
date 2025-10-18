@@ -78,8 +78,8 @@ jobs:
 
     steps:
       # Faz checkout do código
-      # - name: Checkout código
-      #   uses: actions/checkout@v4
+      - name: Checkout código
+        uses: actions/checkout@v4
 
       # Instala o .NET SDK (ajuste conforme sua versão)
       # - name: Configurar .NET
