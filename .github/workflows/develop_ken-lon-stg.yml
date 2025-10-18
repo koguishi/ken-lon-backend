@@ -33,7 +33,7 @@ jobs:
 
       # 🧪 Executa os testes (xUnit, NUnit ou MSTest)
       - name: Run tests
-        run: dotnet test kendo-londrina.sln --no-build --verbosity normal
+        run: dotnet test ./Tests/ken-lon-back-tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
