@@ -23,8 +23,17 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      # 🧩 Restaura todas as dependências da solution (inclui os projetos de teste)
+      - name: Restore dependencies
+        run: dotnet restore my-app.sln
+
+      # 🏗️ Compila todos os projetos (app + testes)
+      - name: Build solution
+        run: dotnet build my-app.sln --configuration Release --no-restore
+
+      # 🧪 Executa os testes (xUnit, NUnit ou MSTest)
+      - name: Run tests
+        run: dotnet test my-app.sln --no-build --verbosity normal
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
