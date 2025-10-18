@@ -90,7 +90,7 @@ jobs:
       # Restaura e publica o projeto do WebJob
       - name: Publicar WebJob
         run: |
-          dotnet publish ./Infra/Workers/pdf-gen-worker.csproj  -c Release -o ./publish/webjob
+          dotnet publish ./Infra/Workers/pdf-gen-worker/pdf-gen-worker.csproj  -c Release -o ./publish/webjob
 
       # Monta estrutura esperada pelo Azure WebJobs
       - name: Estruturar diretório do WebJob
