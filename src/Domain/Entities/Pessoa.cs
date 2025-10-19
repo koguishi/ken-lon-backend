@@ -11,6 +11,16 @@ public class Pessoa : Entity
     virtual public ICollection<ContaPagar>? ContasPagar { get; private set; }    
     virtual public ICollection<ContaReceber>? ContasReceber { get; private set; }    
 
+    private void Validar()
+    {
+        if (EmpresaId == Guid.Empty)
+            throw new DomainException("EmpresaId não pode ser vazio.");
+        if (string.IsNullOrEmpty(Nome))
+            throw new DomainException("Nome não pode ser nulo ou vazio.");
+        if (!string.IsNullOrEmpty(Cpf) && !string.IsNullOrEmpty(Cnpj))
+            throw new DomainException("CPF e CNPJ não podem ser informados simultaneamente.");
+    }
+
     public Pessoa(Guid empresaId, string nome,
         string? codigo = null,
         string? cpf = null,
@@ -21,6 +31,7 @@ public class Pessoa : Entity
         Codigo = codigo;
         Cpf = cpf;
         Cnpj = cnpj;
+        Validar();
     }
 
     // Construtor vazio para EF Core

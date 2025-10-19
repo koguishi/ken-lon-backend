@@ -2,15 +2,13 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kendo-londrina", "kendo-londrina.csproj", "{D598C1B4-A50C-BAF6-417D-E8AE1B490BEF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{49667D45-FE13-4658-ABCF-863EC2F73922}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ken-lon-back-tests", "Tests\ken-lon-back-tests.csproj", "{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pdf-gen-worker", "Workers\pdf-gen-worker\pdf-gen-worker.csproj", "{E2C156C2-38DC-4E4D-85F1-A6F67AB219BC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{A0F64134-9775-4BC8-9902-3BF3D2A51DA9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kendo-londrina", "src\kendo-londrina.csproj", "{EEBEA295-0987-4B63-B45F-8C0B9D47B430}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{1CA51D90-CF4C-4B78-99A5-D76C784C059E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pdf-gen-worker", "Infra\Workers\pdf-gen-worker\pdf-gen-worker.csproj", "{EEC66A0A-4009-48CB-BC2E-8A2575315393}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ken-lon-back-tests", "Tests\ken-lon-back-tests.csproj", "{C29251C9-648D-4651-95BB-C7E157E26975}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,18 +16,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D598C1B4-A50C-BAF6-417D-E8AE1B490BEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D598C1B4-A50C-BAF6-417D-E8AE1B490BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D598C1B4-A50C-BAF6-417D-E8AE1B490BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D598C1B4-A50C-BAF6-417D-E8AE1B490BEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{382F0485-ADFC-4FCB-8CEF-2E788947E0B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEC66A0A-4009-48CB-BC2E-8A2575315393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2C156C2-38DC-4E4D-85F1-A6F67AB219BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2C156C2-38DC-4E4D-85F1-A6F67AB219BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2C156C2-38DC-4E4D-85F1-A6F67AB219BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2C156C2-38DC-4E4D-85F1-A6F67AB219BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEBEA295-0987-4B63-B45F-8C0B9D47B430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEBEA295-0987-4B63-B45F-8C0B9D47B430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEBEA295-0987-4B63-B45F-8C0B9D47B430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEBEA295-0987-4B63-B45F-8C0B9D47B430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C29251C9-648D-4651-95BB-C7E157E26975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C29251C9-648D-4651-95BB-C7E157E26975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C29251C9-648D-4651-95BB-C7E157E26975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C29251C9-648D-4651-95BB-C7E157E26975}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,7 +36,6 @@ Global
 		SolutionGuid = {3779F320-4F92-4E3C-AE43-1E182BE7230E}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1CA51D90-CF4C-4B78-99A5-D76C784C059E} = {A0F64134-9775-4BC8-9902-3BF3D2A51DA9}
-		{EEC66A0A-4009-48CB-BC2E-8A2575315393} = {1CA51D90-CF4C-4B78-99A5-D76C784C059E}
+		{E2C156C2-38DC-4E4D-85F1-A6F67AB219BC} = {49667D45-FE13-4658-ABCF-863EC2F73922}
 	EndGlobalSection
 EndGlobal
