@@ -36,7 +36,7 @@ jobs:
         run: dotnet test ./Tests/ken-lon-back-tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: dotnet publish
-        run: dotnet publish ./kendo-londrina.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish ./src/kendo-londrina.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -90,7 +90,7 @@ jobs:
       # Restaura e publica o projeto do WebJob
       - name: Publicar WebJob
         run: |
-          dotnet publish ./Infra/Workers/pdf-gen-worker/pdf-gen-worker.csproj  -c Release -o ./publish/webjob
+          dotnet publish ./Workers/pdf-gen-worker/pdf-gen-worker.csproj  -c Release -o ./publish/webjob
 
       # Monta estrutura esperada pelo Azure WebJobs
       - name: Estruturar diretório do WebJob
