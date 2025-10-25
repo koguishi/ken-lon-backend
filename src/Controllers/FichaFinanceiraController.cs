@@ -12,12 +12,15 @@ namespace kendo_londrina.Controllers;
 [Route("api/[controller]")]
 public class FichaFinanceiraController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
     private readonly FichaFinanceiraService _service;
     private readonly IMessageQueue _messageQueue;
     public FichaFinanceiraController(
+        IConfiguration configuration,
         FichaFinanceiraService service,
         IMessageQueue messageQueue)
     {
+        _configuration = configuration;
         _service = service;
         _messageQueue = messageQueue;
     }
@@ -66,6 +69,23 @@ public class FichaFinanceiraController : ControllerBase
                 return NotFound(ex.Message);
             return BadRequest(ex.Message);
         }
+    }
+
+    [HttpGet("pdf-url/{jobId:guid}")]
+    public async Task<IActionResult> GetPdfUrl([FromRoute] Guid jobId)
+    {
+        var bucketName = _configuration["CloudflareR2:FichaFinanceiraBucket"]
+            ?? throw new InvalidOperationException("Bucket name not configured.");
+        var key = $"{jobId.ToString()}.pdf";
+        var pdfPreSignedURL = await _service.GetPdfPreSignedURL(bucketName, key);
+        if (pdfPreSignedURL.Status != "pronto")
+            return NotFound();
+
+        return Ok(new
+        {
+            status = pdfPreSignedURL.Status,
+            url = pdfPreSignedURL.Url
+        });
     }
 
 }

@@ -1,5 +1,6 @@
 using kendo_londrina.Application.DTOs;
 using kendo_londrina.Application.DTOs.FichaFinanceira;
+using kendo_londrina.Infra.Storages;
 
 namespace kendo_londrina.Application.Services;
 
@@ -8,12 +9,15 @@ public class FichaFinanceiraService
     private readonly Guid _empresaId;
     private readonly PessoaService _servicePessoa;
     private readonly ContaReceberService _serviceContaReceber;
+    private readonly IFileStorage _fileStorage;
 
     public FichaFinanceiraService(
+        IFileStorage fileStorage,
         ICurrentUserService currentUser,
         PessoaService servicePessoa,
         ContaReceberService serviceContaReceber)
     {
+        _fileStorage = fileStorage;
         _empresaId = Guid.Parse(currentUser.EmpresaId!);
         _servicePessoa = servicePessoa;
         _serviceContaReceber = serviceContaReceber;
@@ -59,5 +63,10 @@ public class FichaFinanceiraService
         };
         return dto;
     }
+
+    public async Task<FileInfoDto> GetPdfPreSignedURL(string bucketName, string key)
+    {
+        return await _fileStorage.FilePreSignedURL(bucketName, key);
+    }    
 
 }

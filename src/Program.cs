@@ -4,6 +4,7 @@ using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Infra.Auditoria;
 using kendo_londrina.Infra.Data;
 using kendo_londrina.Infra.MessageQueue;
+using kendo_londrina.Infra.Storages;
 using kendo_londrina.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -74,6 +75,7 @@ builder.Services.AddDbContext<KendoLondrinaContext>(options =>
 // Dependency Injection
 
 builder.Services.AddSingleton<IMessageQueue, AmazonSQSService>();
+builder.Services.AddSingleton<IFileStorage, CloudflareR2>();
 
 builder.Services.AddScoped<FichaFinanceiraService>();
 
