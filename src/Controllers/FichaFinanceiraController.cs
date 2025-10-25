@@ -71,8 +71,8 @@ public class FichaFinanceiraController : ControllerBase
         }
     }
 
-    [HttpGet("pdf-url/{jobId:guid}")]
-    public async Task<IActionResult> GetPdfUrl([FromRoute] Guid jobId)
+    [HttpGet("pdf-url/{jobId}")]
+    public async Task<IActionResult> GetPdfUrl([FromRoute] string jobId)
     {
         var bucketName = _configuration["CloudflareR2:FichaFinanceiraBucket"]
             ?? throw new InvalidOperationException("Bucket name not configured.");
