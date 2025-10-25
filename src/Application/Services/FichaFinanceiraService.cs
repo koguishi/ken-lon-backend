@@ -50,7 +50,8 @@ public class FichaFinanceiraService
 
         var dto = new FichaFinanceiraDto()
         {
-            JobId = Guid.NewGuid(),
+            // JobId = Guid.NewGuid(),
+            JobId = $"ficha-finan-{pessoa.Nome}-{vencimentoInicial.ToString("ddMMyy")}-{vencimentoFinal.ToString("ddMMyy")}",
             NomePessoa = pessoa.Nome,
             VencimentoInicial = vencimentoInicial,
             VencimentoFinal = vencimentoFinal,

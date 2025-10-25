@@ -38,14 +38,15 @@ public class Worker(
             var ms = _pdfGen.FichaFinanceira(dtoFicha);
             Console.WriteLine($"    >>>  PDF gerado !!!");
 
+            var nomePdf = $"ficha-finan-{dtoFicha.NomePessoa}-{dtoFicha.VencimentoInicial.ToString("ddMMyy")}-{dtoFicha.VencimentoFinal.ToString("ddMMyy")}.pdf";
             // === ARMAZENAR NO R2 ===
             await _storage.UploadPdfAsync(
                 ms,
-                $"{dtoFicha.JobId}.pdf"
+                nomePdf
             );
             Console.WriteLine($"    >>>  Enviado para R2 !!!");
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine($"❌ Erro ao processar mensagem: {ex.Message}");
             throw new Exception(ex.Message);
