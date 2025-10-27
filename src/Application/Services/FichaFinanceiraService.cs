@@ -1,5 +1,6 @@
 using kendo_londrina.Application.DTOs;
 using kendo_londrina.Application.DTOs.FichaFinanceira;
+using kendo_londrina.Infra.PDF_Generators;
 using kendo_londrina.Infra.Storages;
 
 namespace kendo_londrina.Application.Services;
@@ -9,14 +10,17 @@ public class FichaFinanceiraService
     private readonly Guid _empresaId;
     private readonly PessoaService _servicePessoa;
     private readonly ContaReceberService _serviceContaReceber;
+    private readonly IPdfGenerator _pdfGen;
     private readonly IFileStorage _fileStorage;
 
     public FichaFinanceiraService(
+        IPdfGenerator pdfGen,
         IFileStorage fileStorage,
         ICurrentUserService currentUser,
         PessoaService servicePessoa,
         ContaReceberService serviceContaReceber)
     {
+        _pdfGen = pdfGen;
         _fileStorage = fileStorage;
         _empresaId = Guid.Parse(currentUser.EmpresaId!);
         _servicePessoa = servicePessoa;
@@ -63,6 +67,27 @@ public class FichaFinanceiraService
             })]
         };
         return dto;
+    }
+
+    public async Task<FileInfoDto> GerarPDFAsync(
+        Guid pessoaId,
+        DateTime vencimentoInicial,
+        DateTime vencimentoFinal,
+        bool? recebido = null)
+    {
+        var dto = await GerarFichaFinanceiraDtoAsync(pessoaId, vencimentoInicial, vencimentoFinal, recebido);
+
+        var ms = _pdfGen.FichaFinanceira(dto);
+        Console.WriteLine($"    >>>  PDF gerado !!!");
+
+        var nomePdf = $"ficha-finan-{dto.NomePessoa}-{dto.VencimentoInicial.ToString("ddMMyy")}-{dto.VencimentoFinal.ToString("ddMMyy")}.pdf";
+        // === ARMAZENAR NO R2 ===
+        var fileInfoDto = await _fileStorage.UploadPdfAsync(
+            ms,
+            nomePdf
+        );
+        Console.WriteLine($"    >>>  Enviado para R2 !!!");
+        return fileInfoDto;
     }
 
     public async Task<FileInfoDto> GetPdfPreSignedURL(string bucketName, string key)

@@ -52,4 +52,25 @@ public class CloudflareR2(IConfiguration config) : IFileStorage
         }
     }
 
+    public async Task<FileInfoDto> UploadPdfAsync(byte[] pdf, string objectKey)
+    {
+        // === ENVIA PARA CLOUDFLARE R2 ===
+        using var s3Client = new AmazonS3Client(_accessKeyId, _secretAccessKey, _amazonS3Config);
+
+        var putRequest = new PutObjectRequest
+        {
+            InputStream = new MemoryStream(pdf), // usa o stream do PDF gerado
+            Key = objectKey,
+            BucketName = _fichaFinanceiraBucket,
+            DisablePayloadSigning = true,
+            DisableDefaultChecksumValidation = true
+        };
+        var response = await s3Client.PutObjectAsync(putRequest);
+        return new FileInfoDto
+        {
+            FileStorageId = response.ETag,
+            FileName = objectKey,
+        };
+    }
+
 }
