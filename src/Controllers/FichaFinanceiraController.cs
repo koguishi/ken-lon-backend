@@ -71,12 +71,31 @@ public class FichaFinanceiraController : ControllerBase
         }
     }
 
-    [HttpGet("pdf-url/{jobId}")]
-    public async Task<IActionResult> GetPdfUrl([FromRoute] string jobId)
+    [HttpPost("pdf-gen")]
+    public async Task<IActionResult> GerarPDF(
+        [FromBody] FichaFinanceiraRequestDto request)
+    {
+        try
+        {
+            var fileInfoDto = await _service.GerarPDFAsync(
+                request.PessoaId, request.VencimentoInicial, request.VencimentoFinal, request.Recebido
+            );
+            return Ok(fileInfoDto);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("não encontrad"))
+                return NotFound(ex.Message);
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("pdf-url/{fileName}")]
+    public async Task<IActionResult> GetPdfUrl([FromRoute] string fileName)
     {
         var bucketName = _configuration["CloudflareR2:FichaFinanceiraBucket"]
             ?? throw new InvalidOperationException("Bucket name not configured.");
-        var key = $"{jobId.ToString()}.pdf";
+        var key = $"{fileName.ToString()}";
         var pdfPreSignedURL = await _service.GetPdfPreSignedURL(bucketName, key);
         if (pdfPreSignedURL.Status != "pronto")
             return NotFound();
