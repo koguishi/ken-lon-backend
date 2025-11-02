@@ -1,0 +1,71 @@
+name: Build and deploy ASP.Net Core app to Azure Web App - kendo-londrina
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Restore dependencies
+        run: dotnet restore kendo-londrina.sln
+
+      - name: Build solution
+        run: dotnet build kendo-londrina.sln --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test ./Tests/ken-lon-back-tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: dotnet publish
+        run: dotnet publish ./src/kendo-londrina.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    # environment:
+    #   name: production
+    #   url: https://ken-lon.azurewebsites.net # ✅ ajuste a URL real do ambiente PROD
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_389020209DC84128A9966182DB18D131 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CE97869571874F7D85FB93C418DE16FE }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_190FEF48F0AB480C8C1C558587DC2762 }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'kendo-londrina' # ✅ nome do App Service de produção
+          slot-name: 'Production'
+          package: .
