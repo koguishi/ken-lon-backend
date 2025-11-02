@@ -1,4 +1,4 @@
-name: Build and deploy ASP.Net Core app to Azure Web App - kendo-londrina
+name: Build and deploy ASP.Net Core app to Azure Web App - PRODUCTION
 
 on:
   push:
@@ -66,6 +66,6 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'kendo-londrina' # ✅ nome do App Service de produção
+          app-name: 'ken-lon-prd' # ✅ nome do App Service de produção
           slot-name: 'Production'
           package: .
