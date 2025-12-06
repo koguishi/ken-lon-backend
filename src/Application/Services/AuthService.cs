@@ -143,15 +143,15 @@ namespace kendo_londrina.Application.Services
 
         public async Task ChangePasswordAsync(string email, string currentPassword, string newPassword)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            // Don't reveal that the user does not exist or is not confirmed
-            if (user == null || !user.EmailConfirmed)
-                throw new BadHttpRequestException("Senha não foi redefinida");
+            var user = await _userManager.FindByEmailAsync(email)
+                ?? throw new UnauthorizedAccessException("Usuário não encontrado");
+            if (!user.EmailConfirmed)
+                throw new UnauthorizedAccessException("Usuário precisa estar com email confirmado");
 
             var validPassword = await _userManager.CheckPasswordAsync(user, currentPassword);
             // Don't reveal that the password is incorrect
             if (!validPassword)
-                throw new BadHttpRequestException("Senha não foi redefinida");
+                throw new UnauthorizedAccessException("Senha/email errado");
 
             try
             {
