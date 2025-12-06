@@ -84,6 +84,10 @@ public class AuthController : ControllerBase
             await _authService.ChangePasswordAsync(dto.Email, dto.CurrentPassword, dto.NewPassword);
             return Ok("Senha foi redefinida com sucesso.");
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(400, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = ex.Message });
