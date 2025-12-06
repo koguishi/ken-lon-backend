@@ -1,89 +1,169 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using kendo_londrina.Domain;
 using kendo_londrina.Domain.Entities;
 using kendo_londrina.Domain.Repositories;
 using kendo_londrina.Infra.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+
+//TODO: implementar UnitOfWork
 
 namespace kendo_londrina.Application.Services
 {
     public class AuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IConfiguration _configuration;
         private readonly IEmpresaRepository _repoEmpresa;
         private readonly ICurrentUserService _currentUser;
         public AuthService(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IConfiguration configuration,
             IEmpresaRepository repoEmpresa,
             ICurrentUserService currentUser)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
+            _configuration = configuration;
             _repoEmpresa = repoEmpresa;
             _currentUser = currentUser;
         }
 
         public async Task SelfRegisterUserAsync(string email, string password)
         {
-            //TODO: usar UnitOfWork
             var user = new ApplicationUser
             {
                 UserName = email,
                 Email = email,
-                EmpresaRole = "Admin"
             };
             var result = await _userManager.CreateAsync(user, password);
             if (!result.Succeeded)
                 throw new Exception("Erro ao criar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
 
-            await CriarVincularEmpresaAsync(user.Id);
-        }
+            var nomeFantasia = $"Empresa do user {user.UserName}";
 
-        public async Task CriarVincularEmpresaAsync(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId)
-                ?? throw new Exception("Usuário não encontrado");
-            var nomeFantasia = $"Empresa do user {user.Id}";
-
-            // Criar empresa vinculada ao usuário
+            // Criar empresa
             var empresa = new Empresa(nomeFantasia, "PR", "Londrina");
             await _repoEmpresa.AddAsync(empresa);
             await _repoEmpresa.SaveChangesAsync();
 
-            user.VincularEmpresa(empresa.Id);
-
-            await _userManager.UpdateAsync(user);
+            // Vincular empresa ao usuário
+            var claims = new List<Claim>
+            {
+                new("EmpresaId", empresa.Id.ToString()),
+                new("EmpresaRole", Role.Admin.ToString()),
+                // new Claim("OutraClaim", OutraClaim)
+                // ...
+            };
+            var claimResult = _userManager.AddClaimsAsync(user, claims).Result;
         }
 
-        public async Task RegisterUserAsync(string email, string password)
+        public async Task RegisterUserAsync(string email, string password, string? role)
         {
+            if (!Enum.TryParse<Role>(role, out var status))
+            {
+                var msg = $"Roles permitidas: {string.Join(", ", Enum.GetNames<Role>())}";
+                throw new BadHttpRequestException(msg);
+            }
+
             var empresaId = _currentUser.EmpresaId
                 ?? throw new Exception("Usuário atual não está vinculado a nenhuma empresa");
-            // var empresa = _repoEmpresa.GetByIdAsync(Guid.Parse(empresaId))
-            //     ?? throw new Exception("Empresa não encontrada");
 
             var user = new ApplicationUser
             {
                 UserName = email,
                 Email = email,
-                EmpresaRole = "User"
             };
-
-            //TODO: usar UnitOfWork
-            // var result = await _userManager.CreateAsync(user, password);
 
             var result = await _userManager.CreateAsync(user, password);
             if (!result.Succeeded)
                 throw new Exception("Erro ao criar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
 
-            await VincularEmpresaAsync(empresaId, user.Id);
+            // Vincular empresa ao usuário
+            var claims = new List<Claim>
+            {
+                new("EmpresaId", empresaId.ToString()),
+                new("EmpresaRole", role.ToString()),
+                // new Claim("OutraClaim", OutraClaim)
+                // ...
+            };
+            var claimResult = _userManager.AddClaimsAsync(user, claims).Result;            
         }        
-
-        public async Task VincularEmpresaAsync(string empresaId, string userId)
+        public async Task<string> Login(string email, string password)
         {
-            var user = await _userManager.FindByIdAsync(userId)
-                ?? throw new Exception("Usuário não encontrado");
-            var nomeFantasia = $"Empresa do user {user.Id}";
+            ApplicationUser? user;
+            try
+            {
+                user = await _userManager.FindByEmailAsync(email);
+            }
+            catch (Exception ex)
+            {
+                throw new InfraException("Erro ao acessar o banco de dados.", ex);
+            }
+            if (user == null)
+                throw new UnauthorizedAccessException("Usuário/Senha inválido");
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+            if (!result.Succeeded)
+                throw new UnauthorizedAccessException("Usuário/Senha inválido");
 
-            user.VincularEmpresa(Guid.Parse(empresaId));
-
-            await _userManager.UpdateAsync(user);
+            return await GenerateJwtToken(user);
         }
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
+        {
+            var jwtKey = _configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(jwtKey))
+                throw new InvalidOperationException("JWT key is not configured.");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>
+            {
+                new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            };
+            // adicionar claims cadastradas
+            claims.AddRange(_userManager.GetClaimsAsync(user).Result);
+            // adicionar roles (se tiver)
+            var roles = await _userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task ChangePasswordAsync(string email, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(email)
+                ?? throw new UnauthorizedAccessException("Usuário não encontrado");
+            if (!user.EmailConfirmed)
+                throw new UnauthorizedAccessException("Usuário precisa estar com email confirmado");
+
+            var validPassword = await _userManager.CheckPasswordAsync(user, currentPassword);
+            // Don't reveal that the password is incorrect
+            if (!validPassword)
+                throw new UnauthorizedAccessException("Senha/email errado");
+
+            try
+            {
+                var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+                if (!result.Succeeded)
+                    throw new BadHttpRequestException("Erro ao redefinir senha: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+            catch (Exception ex)
+            {
+                throw new BadHttpRequestException(ex.Message);
+            }
+        }
+
     }
 }
