@@ -114,7 +114,23 @@ namespace kendo_londrina.Application.Services
 
             return (ToPessoasDto(pessoas), total);
         }
-        
+
+        public async Task<(List<PessoaDto> Pessoas, int Total)> BuscarPeloNomeAsync(
+            string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+                throw new Exception("Nome para busca requerido");
+
+            var query = _uow.Pessoas.Query(_empresaId);
+            query = query.Where(a => a.Nome.Contains(nome));
+
+            var pessoas = await query
+                .OrderBy(a => a.Nome)
+                .ToListAsync();
+
+            return (ToPessoasDto(pessoas), pessoas.Count);
+        }        
+
         private static List<PessoaDto> ToPessoasDto(List<Pessoa> pessoas)
         {
             var pessoasDto = new List<PessoaDto>();

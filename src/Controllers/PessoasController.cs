@@ -33,6 +33,19 @@ public class PessoasController(PessoaService service) : ControllerBase
             
     }
 
+    [HttpGet("buscar/{nome}")]
+    public async Task<IActionResult> BuscarPeloNome(string nome)
+    {
+        var (pessoas, total) = await _service.BuscarPeloNomeAsync(nome);
+
+        return Ok(new
+        {
+            totalItems = total,
+            pessoas
+        });
+            
+    }
+
     // GET: api/pessoas/5
     [HttpGet("{id:Guid}")]
     public async Task<ActionResult<PessoaDto>> GetById(Guid id)
