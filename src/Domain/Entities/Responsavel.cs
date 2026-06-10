@@ -1,6 +1,6 @@
-using kendo_londrina.Domain;
-using kendo_londrina.Domain.Entities;
 using kendo_londrina.Domain.Entities.BaseClasses;
+
+namespace kendo_londrina.Domain.Entities;
 
 public class Responsavel : Entity
 {

@@ -18,6 +18,7 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Aluno> Alunos => Set<Aluno>();
     public DbSet<Mensalidade> Mensalidades => Set<Mensalidade>();
+    public DbSet<Responsavel> Responsaveis => Set<Responsavel>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -33,6 +34,7 @@ public class KendoLondrinaContext : IdentityDbContext<ApplicationUser>
 
         builder.ApplyConfiguration(new AlunoConfig());
         builder.ApplyConfiguration(new MensalidadeConfig());
+        builder.ApplyConfiguration(new ResponsavelConfig());
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

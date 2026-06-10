@@ -1,6 +1,8 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using kendo_londrina.Domain.Entities;
+
+namespace kendo_londrina.Infra.Data.Config;
 
 public class ResponsavelConfig : IEntityTypeConfiguration<Responsavel>
 {

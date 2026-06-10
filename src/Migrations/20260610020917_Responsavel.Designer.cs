@@ -12,8 +12,8 @@ using kendo_londrina.Infra.Data;
 namespace kendo_londrina.Migrations
 {
     [DbContext(typeof(KendoLondrinaContext))]
-    [Migration("20260610004747_AddResponsavel")]
-    partial class AddResponsavel
+    [Migration("20260610020917_Responsavel")]
+    partial class Responsavel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -215,49 +215,6 @@ namespace kendo_londrina.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Responsavel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EditedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar");
-
-                    b.Property<DateTime?>("EditedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar");
-
-                    b.Property<Guid>("EmpresaId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar");
-
-                    b.Property<string>("Telefone")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmpresaId");
-
-                    b.ToTable("Responsavel");
                 });
 
             modelBuilder.Entity("kendo_londrina.Domain.Entities.Aluno", b =>
@@ -749,6 +706,49 @@ namespace kendo_londrina.Migrations
                     b.ToTable("Pessoas", (string)null);
                 });
 
+            modelBuilder.Entity("kendo_londrina.Domain.Entities.Responsavel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EditedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime?>("EditedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar");
+
+                    b.Property<Guid>("EmpresaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("Telefone")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("Responsaveis", (string)null);
+                });
+
             modelBuilder.Entity("kendo_londrina.Domain.Entities.SubCategoria", b =>
                 {
                     b.Property<Guid>("Id")
@@ -923,17 +923,6 @@ namespace kendo_londrina.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Responsavel", b =>
-                {
-                    b.HasOne("kendo_londrina.Domain.Entities.Empresa", "Empresa")
-                        .WithMany()
-                        .HasForeignKey("EmpresaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Empresa");
-                });
-
             modelBuilder.Entity("kendo_londrina.Domain.Entities.Aluno", b =>
                 {
                     b.HasOne("kendo_londrina.Domain.Entities.Empresa", "Empresa")
@@ -942,7 +931,7 @@ namespace kendo_londrina.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Responsavel", "Responsavel")
+                    b.HasOne("kendo_londrina.Domain.Entities.Responsavel", "Responsavel")
                         .WithMany("Alunos")
                         .HasForeignKey("ResponsavelId");
 
@@ -1040,7 +1029,7 @@ namespace kendo_londrina.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Responsavel", "Responsavel")
+                    b.HasOne("kendo_londrina.Domain.Entities.Responsavel", "Responsavel")
                         .WithMany("Mensalidades")
                         .HasForeignKey("ResponsavelId");
 
@@ -1057,6 +1046,17 @@ namespace kendo_londrina.Migrations
                         .WithMany("Pessoas")
                         .HasForeignKey("EmpresaId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+                });
+
+            modelBuilder.Entity("kendo_londrina.Domain.Entities.Responsavel", b =>
+                {
+                    b.HasOne("kendo_londrina.Domain.Entities.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Empresa");
@@ -1088,13 +1088,6 @@ namespace kendo_londrina.Migrations
                         .HasForeignKey("EmpresaId");
 
                     b.Navigation("Empresa");
-                });
-
-            modelBuilder.Entity("Responsavel", b =>
-                {
-                    b.Navigation("Alunos");
-
-                    b.Navigation("Mensalidades");
                 });
 
             modelBuilder.Entity("kendo_londrina.Domain.Entities.Aluno", b =>
@@ -1129,6 +1122,13 @@ namespace kendo_londrina.Migrations
                     b.Navigation("ContasPagar");
 
                     b.Navigation("ContasReceber");
+                });
+
+            modelBuilder.Entity("kendo_londrina.Domain.Entities.Responsavel", b =>
+                {
+                    b.Navigation("Alunos");
+
+                    b.Navigation("Mensalidades");
                 });
 
             modelBuilder.Entity("kendo_londrina.Domain.Entities.SubCategoria", b =>

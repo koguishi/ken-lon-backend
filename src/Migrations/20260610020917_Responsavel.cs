@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace kendo_londrina.Migrations
 {
     /// <inheritdoc />
-    public partial class AddResponsavel : Migration
+    public partial class Responsavel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,13 +24,13 @@ namespace kendo_londrina.Migrations
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "Responsavel",
+                name: "Responsaveis",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Nome = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    Telefone = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
-                    Email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    Nome = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false),
+                    Telefone = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true),
+                    Email = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true),
                     CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EditedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
@@ -39,9 +39,9 @@ namespace kendo_londrina.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Responsavel", x => x.Id);
+                    table.PrimaryKey("PK_Responsaveis", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Responsavel_Empresas_EmpresaId",
+                        name: "FK_Responsaveis_Empresas_EmpresaId",
                         column: x => x.EmpresaId,
                         principalTable: "Empresas",
                         principalColumn: "Id",
@@ -59,22 +59,22 @@ namespace kendo_londrina.Migrations
                 column: "ResponsavelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Responsavel_EmpresaId",
-                table: "Responsavel",
+                name: "IX_Responsaveis_EmpresaId",
+                table: "Responsaveis",
                 column: "EmpresaId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Alunos_Responsavel_ResponsavelId",
+                name: "FK_Alunos_Responsaveis_ResponsavelId",
                 table: "Alunos",
                 column: "ResponsavelId",
-                principalTable: "Responsavel",
+                principalTable: "Responsaveis",
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Mensalidades_Responsavel_ResponsavelId",
+                name: "FK_Mensalidades_Responsaveis_ResponsavelId",
                 table: "Mensalidades",
                 column: "ResponsavelId",
-                principalTable: "Responsavel",
+                principalTable: "Responsaveis",
                 principalColumn: "Id");
         }
 
@@ -82,15 +82,15 @@ namespace kendo_londrina.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Alunos_Responsavel_ResponsavelId",
+                name: "FK_Alunos_Responsaveis_ResponsavelId",
                 table: "Alunos");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Mensalidades_Responsavel_ResponsavelId",
+                name: "FK_Mensalidades_Responsaveis_ResponsavelId",
                 table: "Mensalidades");
 
             migrationBuilder.DropTable(
-                name: "Responsavel");
+                name: "Responsaveis");
 
             migrationBuilder.DropIndex(
                 name: "IX_Mensalidades_ResponsavelId",
