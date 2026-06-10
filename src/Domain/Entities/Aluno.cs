@@ -4,6 +4,8 @@ namespace kendo_londrina.Domain.Entities;
 
 public class Aluno : Entity
 {
+    public Guid? ResponsavelId { get; private set; }
+    virtual public Responsavel? Responsavel { get; private set; }
     public string Codigo { get; set; } = string.Empty;
     public string Nome { get; set; } = string.Empty;
     public string? Cpf { get; set; }

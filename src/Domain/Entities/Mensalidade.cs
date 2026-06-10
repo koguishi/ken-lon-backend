@@ -4,6 +4,9 @@ namespace kendo_londrina.Domain.Entities
 {
     public class Mensalidade : Entity
     {
+        public Guid? ResponsavelId { get; private set; }
+        virtual public Responsavel? Responsavel { get; private set; }
+    // AlunoId e AlunoNome permanecem intocados por enquanto
         public Guid AlunoId { get; private set; }
         public string? AlunoNome { get; private set; }
         public decimal Valor { get; private set; }
