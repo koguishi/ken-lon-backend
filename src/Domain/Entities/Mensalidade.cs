@@ -7,7 +7,7 @@ namespace kendo_londrina.Domain.Entities
         public Guid? ResponsavelId { get; private set; }
         virtual public Responsavel? Responsavel { get; private set; }
     // AlunoId e AlunoNome permanecem intocados por enquanto
-        public Guid AlunoId { get; private set; }
+        public Guid? AlunoId { get; private set; }
         public string? AlunoNome { get; private set; }
         public decimal Valor { get; private set; }
         public DateTime DataVencimento { get; private set; }
@@ -20,6 +20,13 @@ namespace kendo_londrina.Domain.Entities
         virtual public Aluno? Aluno { get; private set; }
 
         private Mensalidade() { } // para EF Core
+
+        public Mensalidade(Guid responsavelId, decimal valor, DateTime vencimento)
+        {
+            ResponsavelId = responsavelId;
+            Valor = valor;
+            DataVencimento = vencimento;
+        }
 
         public Mensalidade(Guid alunoId, string alunoNome, decimal valor, DateTime vencimento)
         {
