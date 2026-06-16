@@ -60,4 +60,17 @@ public class Aluno : Entity
         Rg = rg;
         Religiao = religiao;
     }
+
+    public void VincularResponsavel(Guid responsavelId)
+    {
+        if (responsavelId == Guid.Empty)
+            throw new DomainException("ResponsavelId não pode ser vazio.");
+        ResponsavelId = responsavelId;
+    }
+
+    public void DesvincularResponsavel()
+    {
+        ResponsavelId = null;
+    }
+
 }

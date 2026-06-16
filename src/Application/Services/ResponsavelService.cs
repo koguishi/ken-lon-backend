@@ -7,16 +7,20 @@ namespace kendo_londrina.Application.Services;
 public class ResponsavelService
 {
     private readonly IResponsavelRepository _repo;
+    private readonly IAlunoRepository _alunoRepo;
     private readonly Guid _empresaId;
 
     // Regra de negócio centralizada aqui
     private const decimal ValorPrimeiroAluno = 50m;
     private const decimal ValorAlunoPosterior = 10m;
 
-    public ResponsavelService(IResponsavelRepository repo, ICurrentUserService currentUser)
+    public ResponsavelService(IResponsavelRepository repo,
+        IAlunoRepository alunoRepo,
+        Guid empresaId)
     {
         _repo = repo;
-        _empresaId = Guid.Parse(currentUser.EmpresaId!);
+        _alunoRepo = alunoRepo;
+        _empresaId = empresaId;
     }
 
     public async Task<Responsavel> CriarAsync(string nome, string? telefone, string? email)
@@ -51,5 +55,32 @@ public class ResponsavelService
             return ValorPrimeiroAluno;
 
         return ValorPrimeiroAluno + (ValorAlunoPosterior * (quantidadeAlunos - 1));
+    }
+
+    public async Task VincularAlunoAsync(Guid responsavelId, Guid alunoId)
+    {
+        var responsavel = await _repo.GetByIdAsync(_empresaId, responsavelId)
+            ?? throw new Exception("Responsável não encontrado.");
+
+        var aluno = await _alunoRepo.GetByIdAsync(alunoId)
+            ?? throw new Exception("Aluno não encontrado.");
+
+        if (aluno.ResponsavelId == responsavelId)
+            throw new DomainException("Aluno já está vinculado a este responsável.");
+
+        aluno.VincularResponsavel(responsavelId);
+        await _alunoRepo.SaveChangesAsync();
+    }
+
+    public async Task DesvincularAlunoAsync(Guid responsavelId, Guid alunoId)
+    {
+        var aluno = await _alunoRepo.GetByIdAsync(alunoId)
+            ?? throw new Exception("Aluno não encontrado.");
+
+        if (aluno.ResponsavelId != responsavelId)
+            throw new DomainException("Aluno não está vinculado a este responsável.");
+
+        aluno.DesvincularResponsavel();
+        await _alunoRepo.SaveChangesAsync();
     }
 }

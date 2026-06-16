@@ -38,6 +38,20 @@ public class ResponsaveisController : ControllerBase
         await _service.AtualizarAsync(id, dto.Nome, dto.Telefone, dto.Email);
         return NoContent();
     }
+
+    [HttpPost("{responsavelId}/alunos/{alunoId}")]
+    public async Task<IActionResult> VincularAluno(Guid responsavelId, Guid alunoId)
+    {
+        await _service.VincularAlunoAsync(responsavelId, alunoId);
+        return NoContent();
+    }
+
+    [HttpDelete("{responsavelId}/alunos/{alunoId}")]
+    public async Task<IActionResult> DesvincularAluno(Guid responsavelId, Guid alunoId)
+    {
+        await _service.DesvincularAlunoAsync(responsavelId, alunoId);
+        return NoContent();
+    }    
 }
 
 public record ResponsavelDto(string Nome, string? Telefone, string? Email);
